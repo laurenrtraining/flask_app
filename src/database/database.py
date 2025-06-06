@@ -10,9 +10,10 @@ class Staff(db.Model):
     __tablename__ = "staff"
 
     staff_id = db.Column(db.Integer, primary_key=True)
+    staff_username = db.Column(db.String(200), nullable=False)
     job_role = db.Column(db.String(100), nullable=False)
     staff_email = db.Column(db.String(200), nullable=False)
-    staff_phone = db.Column(db.String(20), nullable=False)
+    password = db.Column(db.String(200), nullable=False)
 
 class Societies(db.Model):
     __tablename__ = "societies"
