@@ -24,7 +24,19 @@ def index():
 
 @app.route('/sign_in.html', methods=['GET','POST'])
 def sign_in():
+    if request.method == 'POST':
+        username = request.form.get('staff_username')
+        password = request.form.get('password')
+
+        user = Staff.query.filter_by(staff_username=username).first()
+
+        if user and user.password == password:
+            return redirect(url_for('home'))  # or return a success message
+        else:
+            return render_template('sign_in.html', error="Invalid username or password")
+        
     return render_template('sign_in.html')
+
 # testing html page renders
 
 @app.route('/register.html', methods=['GET', 'POST'])
@@ -54,7 +66,7 @@ def registration():
 
         return redirect(url_for('home'))
     
-    return render_template('/register.html')
+    return render_template('register.html')
 
 # testing html page renders
 
