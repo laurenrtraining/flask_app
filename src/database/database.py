@@ -21,9 +21,9 @@ class Societies(db.Model):
     society_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200), nullable=False)
-    meeting_time = db.Column(db.String(20), nullable=False)
-    location = db.Column(db.String(200), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('staff.staff_id'), nullable=False)
+    image_filename = db.Column(db.String(200), nullable=True)  # stores image filepath
+
 
 class Staff_Societies(db.Model):
     __tablename__ = "staff_societies"

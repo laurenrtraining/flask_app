@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About Us</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen flex flex-col bg-cyan-600">
+    <!-- Navbar -->
+    {% include 'navbar/navbar.html' %}
+
+    <!-- Main Body -->
+    <main class="flex-grow mx-auto px-4 py-1 text-white text-center">
+      <div class="p-8">
+        <h1 class="text-3xl font-bold">About Us</h1>
+      </div>
+
+      <section class="mb-10">
+        <h2 class="text-2xl font-semibold mb-4">Our Goal</h2>
+        <p class="text-lg leading-relaxed">
+          Our goal is to create a platform that enables staff to interact and
+          communicate more through their favourite hobbies. We aim to encourage
+          people to join groups of people taking part in new hobbies to break
+          the ice, try something new, and also find likeminded individuals
+          around the office that enjoy similar hobbies.
+        </p>
+      </section>
+
+      <section class="mb-10">
+        <h2 class="text-2xl font-semibold mb-4">What We Do</h2>
+        <p class="text-lg leading-relaxed">
+          Our website creates a safe space where people can try new hobbies,
+          plan meetups and make new friends with likeminded people. We wanted to
+          find a way for people to network around the office and this website
+          enables people to find those with the same hobbies within the work
+          environment with people they might not interact with on a regular
+          basis.
+        </p>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    {% include 'footer/footer.html' %}
+  </body>
+</html>

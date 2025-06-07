@@ -1,14 +1,19 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import os
 from database.database import db, Staff, Societies, Staff_Societies
-from sqlalchemy import inspect
+from werkzeug.utils import secure_filename
 
 instance_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'instance')) 
 # needed so the instance isn't made within src
 
-app = Flask(__name__, instance_path=instance_path, instance_relative_config=True)
+app = Flask(__name__, instance_path=instance_path, instance_relative_config=True, static_folder='static')
 
+# Ensures any uploaded images can be accessed when creating new groups
+UPLOAD_FOLDER = 'static/group_images'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+#  Configuring db
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.instance_path, 'FLASK_DATABASE.db') 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -23,8 +28,9 @@ app.secret_key = os.urandom(24)
 # Add the HTML webpage designs
 @app.route('/')
 def index():
-    return render_template('index.html')
-# testing html page renders
+    groups = Societies.query.all()
+    return render_template('index.html', groups=groups)
+
 
 @app.route('/sign_in.html', methods=['GET','POST'])
 def sign_in():
@@ -36,13 +42,12 @@ def sign_in():
 
         if user and user.password == password:
             session['user_id'] = user.staff_username
-            return redirect(url_for('index'))  # or return a success message
+            return redirect(url_for('index'))
         else:
             return render_template('sign_in.html', error="Invalid username or password")
         
     return render_template('sign_in.html')
 
-# testing html page renders
 
 @app.route('/register.html', methods=['GET', 'POST'])
 def registration():
@@ -63,13 +68,15 @@ def registration():
             staff_username=username,
             job_role=job_role,
             staff_email=email,
-            password=password  # Note: store hashed in real apps!
+            password=password  # Might need to store this hashed eventually
         )
 
         db.session.add(new_staff)
         db.session.commit()
 
-        return redirect(url_for('home'))
+        user = Staff.query.filter_by(staff_username=username).first()
+        session['user_id'] = user.staff_username
+        return redirect(url_for('index'))  
     
     return render_template('register.html')
 
@@ -80,9 +87,49 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
-@app.route('/about.html')
+@app.route('/about')
 def about():
     return render_template('about.html')
+
+
+
+# Creation of new groups
+@app.route('/create-group')
+def create_group():
+    return render_template('create_group.html')
+
+@app.route('/submit-group', methods=['POST'])
+def submit_group():
+    name = request.form.get('name')
+    description = request.form.get('description')
+    image = request.files.get('image_filename')
+     # Get image and secure filename
+
+    if image and image.filename != '':
+        filename = secure_filename(image.filename)
+        image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    else:
+        filename = None
+
+    new_group = Societies(
+        name=name,
+        description=description,
+        created_by=session.get('user_id'),
+        image_filename=filename,
+    )
+
+    db.session.add(new_group)
+    db.session.commit()
+
+    
+    return redirect(url_for('index'))
+
+
+@app.route('/group/<int:group_id>')
+def group_detail(group_id):
+    group = Societies.query.get_or_404(group_id)
+    return render_template('group_detail.html', group=group)
+
 
 # Checking if the database already exists
 
