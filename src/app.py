@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 import os
 from database.database import db, Staff, Societies, Staff_Societies
 from sqlalchemy import inspect
@@ -14,6 +14,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize db with app
 db.init_app(app)
+
+app.secret_key = os.urandom(24)
+# Creating a secret key to run sessions for log ins and sign essential cookies on the website
+# Random creation for added security
 
 #Creating homepage
 # Add the HTML webpage designs
@@ -31,7 +35,8 @@ def sign_in():
         user = Staff.query.filter_by(staff_username=username).first()
 
         if user and user.password == password:
-            return redirect(url_for('home'))  # or return a success message
+            session['user_id'] = user.staff_username
+            return redirect(url_for('index'))  # or return a success message
         else:
             return render_template('sign_in.html', error="Invalid username or password")
         
@@ -70,11 +75,14 @@ def registration():
 
 # testing html page renders
 
-@app.route('/home.html')
-def home():
-    return render_template('home.html')  # Make sure home.html exists in your templates folder
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
 
-
+@app.route('/about.html')
+def about():
+    return render_template('about.html')
 
 # Checking if the database already exists
 

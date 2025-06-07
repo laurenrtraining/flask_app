@@ -14,6 +14,7 @@
           <div class="flex">
             <!-- Logo -->
             <div
+              href="index.html"
               class="flex-shrink-0 flex items-center text-xl font-bold text-white"
             >
               Social Societies
@@ -22,19 +23,13 @@
             <!-- Links -->
             <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
               <a
-                href="/"
-                class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-white hover:border-blue-500 hover:text-blue-600"
-              >
-                Home
-              </a>
-              <a
-                href="/about"
+                href="about"
                 class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-white hover:border-blue-500 hover:text-blue-600"
               >
                 About
               </a>
               <a
-                href="/contact"
+                href="contact.html"
                 class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-white hover:border-blue-500 hover:text-blue-600"
               >
                 Contact
@@ -42,19 +37,24 @@
             </div>
           </div>
 
-          <!-- Right Side -->
-          <div class="flex items-center gap-4">
+          <div class="flex items-center">
+            {% if 'user_id' in session %}
+            <!-- Show Sign Out -->
             <a
-              href="/sign_in.html"
-              class="bg-cyan-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
-              >Sign in</a
+              href="{{ url_for('logout') }}"
+              class="bg-cyan-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-70"
             >
-            <a
-              href="/register.html"
-              class="bg-cyan-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
-            >
-              Register
+              Sign Out
             </a>
+            {% else %}
+            <!-- Show Sign In -->
+            <a
+              href="{{ url_for('sign_in') }}"
+              class="bg-cyan-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-70"
+            >
+              Sign In
+            </a>
+            {% endif %}
           </div>
         </div>
       </div>
