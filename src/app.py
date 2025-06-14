@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, abort
 import os
 from database.database import db, Staff, Societies, Staff_Societies, Date_Availability
 from werkzeug.utils import secure_filename
@@ -46,7 +46,7 @@ def sign_in():
         user = Staff.query.filter_by(staff_username=username).first()
 
         if user and user.password == password:
-            session['user_id'] = user.staff_username
+            session['user_id'] = user.staff_id
             return redirect(url_for('index'))
         else:
             return render_template('sign_in.html', error="Invalid username or password")
@@ -80,7 +80,7 @@ def registration():
         db.session.commit()
 
         user = Staff.query.filter_by(staff_username=username).first()
-        session['user_id'] = user.staff_username
+        session['user_id'] = user.staff_id
         return redirect(url_for('index'))  
     
     return render_template('register.html')
@@ -132,16 +132,27 @@ def submit_group():
 @app.route('/group/<int:group_id>', methods=['GET', 'POST'])
 def group_detail(group_id):
     group = Societies.query.get_or_404(group_id)
-    today = date.today()
-    date_list = [(today + timedelta(days=i)).strftime('%a<br />%d-%m')for i in range(31)]
+
+    today = date.today() 
+    #From today, the calendar will show a consecutive month
+    date_list = [(today + timedelta(days=i)).strftime('%a<br />%d-%m')for i in range(31)] 
+    # In the form (abbreviated day, date, month)
 
     error = None  # default no error
+    
+    user_id = session.get('user_id')
+    is_creator = (user_id == group.created_by) if user_id else False
+    # checks if the society was created by the user currently logged in
+
+    print("User ID in session:", user_id)
+    print("Group created_by:", group.created_by)
+    print("Is creator?", is_creator)
 
     if request.method == 'POST':
         if 'user_id' not in session:
+            # If the user isn't logged in this error will be thrown
             error = "You must be logged in to submit availability."
         else:
-            user_id = session['user_id']
             selected_dates = set(request.form.getlist('available_dates'))
 
              # Clear old availability entries for this user in this group
@@ -173,11 +184,23 @@ def group_detail(group_id):
     return render_template(
         'society_template/group_detail.html',
         group=group,
+        is_creator=is_creator,
         date_list=date_list,
         common_dates=common_dates,
         error=error
     )
 
+@app.route('/group/<int:group_id>/delete', methods=['POST'])
+def delete_group(group_id):
+    group = Societies.query.get_or_404(group_id)
+    user_id = session.get('user_id')
+
+    if user_id != group.created_by:
+        abort(403)  # Forbidden
+
+    db.session.delete(group)
+    db.session.commit()
+    return redirect(url_for('index'))  # Return to homepage
 
 # Checking if the database already exists
 
