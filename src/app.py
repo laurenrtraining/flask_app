@@ -1,12 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import os
-from database.database import db, Staff, Societies, Staff_Societies
+from database.database import db, Staff, Societies, Staff_Societies, Date_Availability
 from werkzeug.utils import secure_filename
+from datetime import date, timedelta
+from collections import defaultdict
 
 instance_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'instance')) 
 # needed so the instance isn't made within src
 
 app = Flask(__name__, instance_path=instance_path, instance_relative_config=True, static_folder='static')
+
+# In memory calendar store for demo
+user_availability = {} 
 
 # Ensures any uploaded images can be accessed when creating new groups
 UPLOAD_FOLDER = 'static/group_images'
@@ -124,11 +129,54 @@ def submit_group():
     
     return redirect(url_for('index'))
 
-
-@app.route('/group/<int:group_id>')
+@app.route('/group/<int:group_id>', methods=['GET', 'POST'])
 def group_detail(group_id):
     group = Societies.query.get_or_404(group_id)
-    return render_template('group_detail.html', group=group)
+    today = date.today()
+    date_list = [(today + timedelta(days=i)).strftime('%a<br />%d-%m')for i in range(31)]
+
+    error = None  # default no error
+
+    if request.method == 'POST':
+        if 'user_id' not in session:
+            error = "You must be logged in to submit availability."
+        else:
+            user_id = session['user_id']
+            selected_dates = set(request.form.getlist('available_dates'))
+
+             # Clear old availability entries for this user in this group
+            Date_Availability.query.filter_by(user_id=user_id, group_id=group_id).delete()
+
+            # Add new entries
+            for date_str in selected_dates:
+                new_entry = Date_Availability(
+                    group_id=group_id,
+                    user_id=user_id,
+                    available_dates=date_str  # assuming it's stored as a string in your model
+                )
+                db.session.add(new_entry)
+
+            db.session.commit()
+
+    # Calculate common dates for display
+    availability = defaultdict(set)
+    entries = Date_Availability.query.filter_by(group_id=group_id).all()
+
+    for entry in entries:
+        availability[entry.user_id].add(entry.available_dates)
+
+    if availability:
+        common_dates = set.intersection(*availability.values())
+    else:
+        common_dates = set()
+
+    return render_template(
+        'society_template/group_detail.html',
+        group=group,
+        date_list=date_list,
+        common_dates=common_dates,
+        error=error
+    )
 
 
 # Checking if the database already exists
