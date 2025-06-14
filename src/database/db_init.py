@@ -1,5 +1,5 @@
 from flask import Flask
-from database import db  # adjust import to where your app and db live
+from database import db, Staff  # adjust import to where your app and db live
 import os
 
 
@@ -17,6 +17,22 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         print("Database tables created!")
+
+        # Check if admin user exists
+        admin = Staff.query.filter_by(staff_username='admin').first()
+        if not admin:
+            admin_user = Staff(
+            staff_username='admin',
+            job_role='admin',
+            staff_email='admin@staff.uk',
+            password='admin123'
+        )
+            db.session.add(admin_user)
+            db.session.commit()
+            print("Admin user created!")
+        else:
+            print("Admin user already exists.")
+
 
 
 # Only run once to initialise database

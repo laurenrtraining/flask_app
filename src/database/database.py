@@ -21,9 +21,9 @@ class Societies(db.Model):
     society_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200), nullable=False)
-    meeting_time = db.Column(db.String(20), nullable=False)
-    location = db.Column(db.String(200), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('staff.staff_id'), nullable=False)
+    image_filename = db.Column(db.String(200), nullable=True)  # stores image filepath
+
 
 class Staff_Societies(db.Model):
     __tablename__ = "staff_societies"
@@ -33,3 +33,11 @@ class Staff_Societies(db.Model):
     society_id = db.Column(db.Integer, db.ForeignKey('societies.society_id'), nullable=False)
     date_joined = db.Column(db.String(200), nullable=False)
     society_role = db.Column(db.String(20), nullable=False)
+
+class Date_Availability(db.Model):
+    __tablename__ = "date_availability"
+
+    date_availability_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('staff.staff_id'), nullable=False)
+    group_id = db.Column(db.Integer, db.ForeignKey('societies.society_id'), nullable=False)
+    available_dates = db.Column(db.PickleType, nullable=False)  # Stores list of dates
