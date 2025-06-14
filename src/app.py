@@ -8,7 +8,7 @@ from collections import defaultdict
 instance_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'instance')) 
 # needed so the instance isn't made within src
 
-app = Flask(__name__, instance_path=instance_path, instance_relative_config=True, static_folder='static')
+app = Flask(__name__, instance_path=instance_path, instance_relative_config=True, static_folder='static', template_folder='templates')
 
 # In memory calendar store for demo
 user_availability = {} 
@@ -110,12 +110,13 @@ def submit_group():
     image = request.files.get('image_filename')
      # Get image and secure filename
 
+    filename='default.png'
+
     if image and image.filename != '':
         filename = secure_filename(image.filename)
-        image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    else:
-        filename = None
+        image.save(os.path.join(app.static_folder, 'group_images', filename))
 
+    # Save to database
     new_group = Societies(
         name=name,
         description=description,
