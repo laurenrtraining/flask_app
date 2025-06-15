@@ -32,7 +32,6 @@ class Staff_Societies(db.Model):
     staff_id = db.Column(db.Integer, db.ForeignKey('staff.staff_id'), nullable=False)
     society_id = db.Column(db.Integer, db.ForeignKey('societies.society_id'), nullable=False)
     date_joined = db.Column(db.String(200), nullable=False)
-    society_role = db.Column(db.String(20), nullable=False)
 
 class Date_Availability(db.Model):
     __tablename__ = "date_availability"

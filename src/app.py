@@ -47,7 +47,7 @@ def sign_in():
 
         if user and user.password == password:
             session['user_id'] = user.staff_id
-            return redirect(url_for('index'))
+            return redirect(url_for('index')) # these call route through the name of the funtion, not the html route - makes the code tidier
         else:
             return render_template('sign_in.html', error="Invalid username or password")
         
@@ -96,6 +96,21 @@ def logout():
 def about():
     return render_template('about.html')
 
+@app.route('/my_groups')
+def my_groups():
+    user_id = session.get('user_id')
+    if not user_id:
+        return render_template('my_groups.html', user_id=None, groups=[])
+
+    memberships = Staff_Societies.query.filter_by(staff_id=user_id).all()
+    # checks the Staff_Societies db for where the current logged in staff matched
+    society_ids = [x.society_id for x in memberships]
+    # Loops through Staff Societies and finds the Society_id for each of them
+
+    user_societies = Societies.query.filter(Societies.society_id.in_(society_ids)).all()
+    # groups all the ids from the previous check together to be called
+
+    return render_template('my_groups.html', user_id=user_id, groups=user_societies)
 
 
 # Creation of new groups
@@ -133,6 +148,10 @@ def submit_group():
 @app.route('/group/<int:group_id>', methods=['GET', 'POST'])
 def group_detail(group_id):
     group = Societies.query.get_or_404(group_id)
+    user_id = session.get('user_id')
+    
+    is_creator = (user_id == group.created_by) if user_id else False
+    # checks if the society was created by the user currently logged in
 
     today = date.today() 
     #From today, the calendar will show a consecutive month
@@ -140,14 +159,14 @@ def group_detail(group_id):
     # In the form (abbreviated day, date, month)
 
     error = None  # default no error
-    
-    user_id = session.get('user_id')
-    is_creator = (user_id == group.created_by) if user_id else False
-    # checks if the society was created by the user currently logged in
 
-    print("User ID in session:", user_id)
-    print("Group created_by:", group.created_by)
-    print("Is creator?", is_creator)
+    # Is user already a member of this group
+    is_member = False
+
+    if user_id:
+        is_member = Staff_Societies.query.filter_by(staff_id=user_id, society_id=group_id).first()
+    
+ 
 
     if request.method == 'POST':
         if 'user_id' not in session:
@@ -185,6 +204,7 @@ def group_detail(group_id):
     return render_template(
         'society_template/group_detail.html',
         group=group,
+        is_member=is_member,
         is_creator=is_creator,
         date_list=date_list,
         common_dates=common_dates,
@@ -202,6 +222,40 @@ def delete_group(group_id):
     db.session.delete(group)
     db.session.commit()
     return redirect(url_for('index'))  # Return to homepage
+
+# Join Group
+@app.route('/group/<int:group_id>/join', methods=['POST'])
+def join_group(group_id):
+    user_id = session.get('user_id')
+
+    # If user is not logged in
+    if not user_id:
+        return redirect(url_for('group_detail', group_id=group_id), error="Please log in to join this society")
+
+    # Add new member
+    member = Staff_Societies(
+        staff_id=user_id,
+        society_id=group_id,
+        date_joined=date.today()
+    )
+    db.session.add(member)
+    db.session.commit()
+    return redirect(url_for('group_detail', group_id=group_id))
+
+@app.route('/group/<int:group_id>/leave', methods=['POST'])
+def leave_group(group_id):
+    user_id = session.get('user_id')
+    
+    if not user_id:
+        return redirect(url_for('group_detail', group_id=group_id), error="Please log in to leave this society")
+
+    membership = Staff_Societies.query.filter_by(staff_id=user_id, society_id=group_id).first()
+    if membership:
+        db.session.delete(membership)
+        db.session.commit()
+
+    return redirect(url_for('group_detail', group_id=group_id))
+
 
 # Checking if the database already exists
 
