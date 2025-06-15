@@ -202,13 +202,13 @@ def group_detail(group_id):
             selected_dates = set(request.form.getlist('available_dates'))
 
              # Clear old availability entries for this user in this group
-            Date_Availability.query.filter_by(user_id=user_id, group_id=group_id).delete()
+            Date_Availability.query.filter_by(staff_id=user_id, society_id=group_id).delete()
 
             # Add new entries
             for date_str in selected_dates:
                 new_entry = Date_Availability(
-                    group_id=group_id,
-                    user_id=user_id,
+                    society_id=group_id,
+                    staff_id=user_id,
                     available_dates=date_str  # assuming it's stored as a string in your model
                 )
                 db.session.add(new_entry)
@@ -217,10 +217,10 @@ def group_detail(group_id):
 
     # Calculate common dates for display
     availability = defaultdict(set)
-    entries = Date_Availability.query.filter_by(group_id=group_id).all()
+    entries = Date_Availability.query.filter_by(society_id=group_id).all()
 
     for entry in entries:
-        availability[entry.user_id].add(entry.available_dates)
+        availability[entry.staff_id].add(entry.available_dates)
 
     if availability:
         common_dates = set.intersection(*availability.values())

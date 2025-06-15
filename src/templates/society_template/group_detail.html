@@ -8,12 +8,14 @@
   {% if not is_creator %}
   <!-- Join/Leave Society button -->
   {% if is_member %}
-  <button
-    onclick="openLeaveModal()"
-    class="bg-amber-600 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-700"
-  >
-    Leave Society
-  </button>
+  <div class="fixed bottom-16 right-4">
+    <button
+      onclick="openLeaveModal()"
+      class="bg-amber-600 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-700"
+    >
+      Leave Society
+    </button>
+  </div>
 
   <!-- Confirmation of leave society pop up -->
   <div
@@ -47,12 +49,14 @@
     </div>
   </div>
   {% else %}
-  <button
-    onclick="openJoinModal()"
-    class="bg-amber-600 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-700"
-  >
-    Join Society
-  </button>
+  <div class="fixed bottom-4 right-4">
+    <button
+      onclick="openJoinModal()"
+      class="bg-amber-600 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-700"
+    >
+      Join Society
+    </button>
+  </div>
 
   <!-- Confirmation of join society popup -->
   <div
@@ -87,132 +91,130 @@
   </div>
   {% endif %} {% endif %}
 
-  <body class="min-h-screen py-10 px-4">
-    <div class="max-w-3xl mx-auto bg-white shadow-md rounded-xl p-8">
-      <h1 class="text-3xl font-bold text-center text-cyan-700 mb-6">
-        Group Availability Calendar
-      </h1>
-      <p class="text-center">
-        Select the days you are available within the next month
-      </p>
+  <div class="max-w-3xl w-full bg-white shadow-md rounded-xl p-8 ml-auto">
+    <h1 class="text-3xl font-bold text-center text-cyan-700 mb-6">
+      Group Availability Calendar
+    </h1>
+    <p class="text-center">
+      Select the days you are available within the next month
+    </p>
 
-      <!-- Form -->
-      <div class="bg-white p-6 rounded-lg shadow max-w-2xl mx-auto">
-        <h2 class="text-xl font-semibold mb-4 text-center">
-          Select Your Availability
-        </h2>
-        <form method="POST">
-          <div class="grid grid-cols-7 gap-2 my-4">
-            {% for day in date_list %}
-            <label class="cursor-pointer">
-              <input
-                type="checkbox"
-                name="available_dates"
-                value="{{ day }}"
-                class="hidden peer"
-              />
-              <div
-                class="peer-checked:bg-green-500 bg-gray-300 p-2 rounded text-center"
-              >
-                {{ day | safe }}
-              </div>
-            </label>
-            {% endfor %}
-          </div>
-          <button
-            type="submit"
-            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Submit Availability
-          </button>
-        </form>
-
-        <!-- Display common dates -->
-        <div class="mt-4">
-          <h2 class="text-lg font-bold">Common Availability:</h2>
-          <ul>
-            {% for day in common_dates %}
-            <li class="text-green-700">{{ day | replace('<br />', ' ') }}</li>
-            {% else %}
-            <li class="text-red-600">No common dates yet.</li>
-            {% endfor %}
-          </ul>
+    <!-- Form -->
+    <div class="bg-white p-6 rounded-lg shadow max-w-2xl mx-auto">
+      <h2 class="text-xl font-semibold mb-4 text-center">
+        Select Your Availability
+      </h2>
+      <form method="POST">
+        <div class="grid grid-cols-7 gap-2 my-4">
+          {% for day in date_list %}
+          <label class="cursor-pointer">
+            <input
+              type="checkbox"
+              name="available_dates"
+              value="{{ day }}"
+              class="hidden peer"
+            />
+            <div
+              class="peer-checked:bg-green-500 bg-gray-300 p-2 rounded text-center"
+            >
+              {{ day | safe }}
+            </div>
+          </label>
+          {% endfor %}
         </div>
+        <button
+          type="submit"
+          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Submit Availability
+        </button>
+      </form>
+
+      <!-- Display common dates -->
+      <div class="mt-4">
+        <h2 class="text-lg font-bold">Common Availability:</h2>
+        <ul>
+          {% for day in common_dates %}
+          <li class="text-green-700">{{ day | replace('<br />', ' ') }}</li>
+          {% else %}
+          <li class="text-red-600">No common dates yet.</li>
+          {% endfor %}
+        </ul>
       </div>
     </div>
+  </div>
 
-    {% if is_creator %}
-    <!-- Delete Society button -->
+  {% if is_creator %}
+  <!-- Delete Society button -->
+  <div class="fixed bottom-16 right-4">
     <button
       onclick="openModal()"
-      class="bg-red-600 text-white px-4 py-2 rounded-full text-sm hover:bg-red-700"
+      class="bg-red-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-red-700"
     >
       Delete Society
     </button>
+  </div>
 
-    <!-- Confirmation of deletion pop up -->
-    <div
-      id="confirmModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
-    >
-      <div
-        class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md text-center"
+  <!-- Confirmation of deletion pop up -->
+  <div
+    id="confirmModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
+  >
+    <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md text-center">
+      <h2 class="text-xl font-bold mb-4">Are you sure?</h2>
+      <p class="mb-6">
+        This will permanently delete the society and automatically remove other
+        members.
+      </p>
+      <form
+        method="POST"
+        action="{{ url_for('delete_group', group_id=group.society_id) }}"
       >
-        <h2 class="text-xl font-bold mb-4">Are you sure?</h2>
-        <p class="mb-6">
-          This will permanently delete the society and automatically remove
-          other members.
-        </p>
-        <form
-          method="POST"
-          action="{{ url_for('delete_group', group_id=group.society_id) }}"
+        <button
+          type="submit"
+          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 mr-2"
         >
-          <button
-            type="submit"
-            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 mr-2"
-          >
-            Confirm Leave
-          </button>
-          <button
-            type="button"
-            onclick="closeModal()"
-            class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-          >
-            Cancel
-          </button>
-        </form>
-      </div>
+          Confirm Leave
+        </button>
+        <button
+          type="button"
+          onclick="closeModal()"
+          class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+      </form>
     </div>
-    {% endif %}
+  </div>
+  {% endif %}
 
-    <!-- You can add more dynamic group features here -->
+  <!-- You can add more dynamic group features here -->
 
-    <!-- Script for modal -->
-    <script>
-      function openModal() {
-        document.getElementById("confirmModal").classList.remove("hidden");
-      }
+  <!-- Script for modal -->
+  <script>
+    function openModal() {
+      document.getElementById("confirmModal").classList.remove("hidden");
+    }
 
-      function openJoinModal() {
-        document.getElementById("confirmJoinModal").classList.remove("hidden");
-      }
-      function openLeaveModal() {
-        document.getElementById("confirmLeaveModal").classList.remove("hidden");
-      }
+    function openJoinModal() {
+      document.getElementById("confirmJoinModal").classList.remove("hidden");
+    }
+    function openLeaveModal() {
+      document.getElementById("confirmLeaveModal").classList.remove("hidden");
+    }
 
-      function closeModal() {
-        document.getElementById("confirmModal").classList.add("hidden");
-      }
-      function closeJoinModal() {
-        document.getElementById("confirmJoinModal").classList.add("hidden");
-      }
-      function closeLeaveModal() {
-        document.getElementById("confirmLeaveModal").classList.add("hidden");
-      }
-    </script>
-  </body>
-  {% endblock %}
+    function closeModal() {
+      document.getElementById("confirmModal").classList.add("hidden");
+    }
+    function closeJoinModal() {
+      document.getElementById("confirmJoinModal").classList.add("hidden");
+    }
+    function closeLeaveModal() {
+      document.getElementById("confirmLeaveModal").classList.add("hidden");
+    }
+  </script>
 </main>
+{% endblock %}
 
 <!-- Code to create error popup -->
 {% if error %}
