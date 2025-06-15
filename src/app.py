@@ -219,6 +219,11 @@ def delete_group(group_id):
     if user_id != group.created_by:
         abort(403)  # Forbidden
 
+    membership = Staff_Societies.query.filter_by(society_id=group_id).first()
+    if membership:
+        db.session.delete(membership)
+        db.session.commit()
+
     db.session.delete(group)
     db.session.commit()
     return redirect(url_for('index'))  # Return to homepage
