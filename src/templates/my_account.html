@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Account</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen flex flex-col bg-cyan-600">
+    <!-- Navbar -->
+    {% include 'navbar/navbar.html' %}
+
+    <!-- Main Body -->
+    <main class="flex-grow mx-auto px-4 py-1 text-white text-center">
+      <div class="p-8">
+        <h1 class="text-3xl font-bold">Hello {{staff_username}}</h1>
+      </div>
+
+      <!-- Delete Account -->
+      <button
+        onclick="openDeleteModal()"
+        class="bg-red-600 text-white px-4 py-2 rounded-full text-sm hover:bg-red-700"
+      >
+        Delete Account
+      </button>
+
+      <!-- Confirmation deletion of account -->
+      <div
+        id="confirmDeleteModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
+      >
+        <div
+          class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md text-center text-black"
+        >
+          <h2 class="text-xl font-bold mb-4">Are you sure?</h2>
+          <p class="mb-6">This will permanently delete your account</p>
+          <form
+            method="POST"
+            action="{{ url_for('delete_account', staff_id=staff.staff_id) }}"
+          >
+            <button
+              type="submit"
+              class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 mr-2"
+            >
+              Confirm Account Deletion
+            </button>
+            <button
+              type="button"
+              onclick="closeDeleteModal()"
+              class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    {% include 'footer/footer.html' %}
+
+    <script>
+      function openDeleteModal() {
+        document
+          .getElementById("confirmDeleteModal")
+          .classList.remove("hidden");
+      }
+
+      function closeDeleteModal() {
+        document.getElementById("confirmDeleteModal").classList.add("hidden");
+      }
+    </script>
+  </body>
+</html>
