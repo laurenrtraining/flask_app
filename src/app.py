@@ -34,7 +34,8 @@ app.secret_key = os.urandom(24)
 @app.route('/')
 def index():
     groups = Societies.query.all()
-    return render_template('index.html', groups=groups)
+    staff_username = session.get('staff_username')
+    return render_template('index.html', groups=groups, staff_username=staff_username)
 
 # Render sign in page
 @app.route('/sign_in.html', methods=['GET','POST'])
@@ -47,6 +48,7 @@ def sign_in():
 
         if user and user.password == password:
             session['user_id'] = user.staff_id
+            session['staff_username'] = user.staff_username
             return redirect(url_for('index')) # these call route through the name of the funtion, not the html route - makes the code tidier
         else:
             return render_template('sign_in.html', error="Invalid username or password")
@@ -81,6 +83,7 @@ def registration():
 
         user = Staff.query.filter_by(staff_username=username).first()
         session['user_id'] = user.staff_id
+        session['staff_username'] = user.staff_username
         return redirect(url_for('index'))  
     
     return render_template('register.html')
@@ -91,7 +94,24 @@ def logout():
     return redirect(url_for('index'))
 
 
+### RENDERING ACCOUNT PAGE AND SETTINGS ###
 
+
+@app.route('/my_account')
+def my_account():
+    user_id = session.get('user_id')
+    staff_username = session.get('staff_username')
+    staff = Staff.query.get(user_id)
+
+    return render_template('my_account.html', staff=staff, staff_username=staff_username)
+
+@app.route('/staff/<int:staff_id>/delete', methods=['POST'])
+def delete_account(staff_id):
+    staff = Staff.query.get_or_404(staff_id)
+    db.session.delete(staff)
+    db.session.commit()
+    session.clear()
+    return redirect(url_for('index'))  # Return to homepage
 
 ### RENDERING NAVBAR LINKS ###
 
