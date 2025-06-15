@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Groups</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen flex flex-col bg-cyan-600">
+    <!-- Navbar -->
+    {% include 'navbar/navbar.html' %}
+
+    <!-- Main Body -->
+    {% if not user_id %}
+    <main class="flex-grow">
+      <div class="p-8">
+        <h1 class="text-3xl font-bold text-center text-white">
+          You need to be signed in to view this page
+        </h1>
+      </div>
+    </main>
+    {% else %}
+    <main class="flex-grow">
+      <div class="p-8">
+        <h1 class="text-3xl font-bold text-center text-white">My Groups</h1>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 p-8">
+        {% for group in groups %}
+        <a
+          href="{{ url_for('group_detail', group_id=group.society_id) }}"
+          class="block bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition duration-300"
+        >
+          {% if group.image_filename %}
+          <img
+            src="{{ url_for('static', filename='group_images/' + group.image_filename) }}"
+            alt="{{ group.name }}"
+            class="w-full h-32 object-cover rounded-t-lg"
+          />
+          {% else %}
+          <img
+            src="{{ url_for('static', filename='default.png') }}"
+            alt="Default image"
+            class="w-full h-32 object-cover rounded-t-lg"
+          />
+          {% endif %}
+
+          <div class="p-4">
+            <h2 class="text-xl font-semibold text-gray-800">
+              {{ group.name }}
+            </h2>
+            <p class="text-gray-600 text-sm mt-2">{{ group.description }}</p>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </main>
+    {% endif %}
+
+    <!-- Footer -->
+    {% include 'footer/footer.html' %}
+  </body>
+</html>
