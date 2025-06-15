@@ -14,3 +14,4 @@ instance/
 
 # Ignore compiled files
 *.log
+instance/FLASK_DATABASE.db
