@@ -5,15 +5,23 @@
     <h1 class="text-3xl font-bold text-center text-white">{{group.name}}</h1>
   </div>
 
+  {% if user_id %}
+  <!-- If user is not signed in, do not render the Join/Leave society button -->
+
+  <!-- If user is not the creator of the page not are they admins -->
   {% if not is_creator %}
+
   <!-- Join/Leave Society button -->
   {% if is_member %}
-  <button
-    onclick="openLeaveModal()"
-    class="bg-amber-600 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-700"
-  >
-    Leave Society
-  </button>
+  <!-- If already a member, they can leave -->
+  <div class="fixed bottom-16 right-4">
+    <button
+      onclick="openLeaveModal()"
+      class="bg-amber-600 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-700"
+    >
+      Leave Society
+    </button>
+  </div>
 
   <!-- Confirmation of leave society pop up -->
   <div
@@ -47,12 +55,15 @@
     </div>
   </div>
   {% else %}
-  <button
-    onclick="openJoinModal()"
-    class="bg-amber-600 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-700"
-  >
-    Join Society
-  </button>
+  <!-- If not already a member, they can join -->
+  <div class="fixed bottom-16 right-4">
+    <button
+      onclick="openJoinModal()"
+      class="bg-amber-600 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-700"
+    >
+      Join Society
+    </button>
+  </div>
 
   <!-- Confirmation of join society popup -->
   <div
@@ -85,7 +96,7 @@
       </form>
     </div>
   </div>
-  {% endif %} {% endif %}
+  {% endif %} {% endif %} {% endif %}
 
   <body class="min-h-screen py-10 px-4">
     <div class="max-w-3xl mx-auto bg-white shadow-md rounded-xl p-8">
@@ -141,8 +152,9 @@
       </div>
     </div>
 
-    {% if is_creator %}
-    <!-- Delete Society button -->
+  {% if can_delete %}
+  <!-- Delete Society button -->
+  <div class="fixed bottom-16 right-4">
     <button
       onclick="openModal()"
       class="bg-red-600 text-white px-4 py-2 rounded-full text-sm hover:bg-red-700"
@@ -150,40 +162,38 @@
       Delete Society
     </button>
 
-    <!-- Confirmation of deletion pop up -->
-    <div
-      id="confirmModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
-    >
-      <div
-        class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md text-center"
+  <!-- Confirmation of deletion pop up -->
+  <div
+    id="confirmModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
+  >
+    <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md text-center">
+      <h2 class="text-xl font-bold mb-4">Are you sure?</h2>
+      <p class="mb-6">
+        This will permanently delete the society and automatically remove other
+        members.
+      </p>
+      <form
+        method="POST"
+        action="{{ url_for('delete_group', group_id=group.society_id) }}"
       >
-        <h2 class="text-xl font-bold mb-4">Are you sure?</h2>
-        <p class="mb-6">
-          This will permanently delete the society and automatically remove
-          other members.
-        </p>
-        <form
-          method="POST"
-          action="{{ url_for('delete_group', group_id=group.society_id) }}"
+        <button
+          type="submit"
+          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 mr-2"
         >
-          <button
-            type="submit"
-            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 mr-2"
-          >
-            Confirm Leave
-          </button>
-          <button
-            type="button"
-            onclick="closeModal()"
-            class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-          >
-            Cancel
-          </button>
-        </form>
-      </div>
+          Confirm Deletion
+        </button>
+        <button
+          type="button"
+          onclick="closeModal()"
+          class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+      </form>
     </div>
-    {% endif %}
+  </div>
+  {% endif %}
 
     <!-- You can add more dynamic group features here -->
 
