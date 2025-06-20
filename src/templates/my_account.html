@@ -16,6 +16,12 @@
         <h1 class="text-3xl font-bold">Hello {{staff_username}}</h1>
       </div>
 
+      {% if staff_username == 'admin' %}
+      <div class="p-8">
+        <h1 class="text-3xl font-bold">Admins cannot delete their account</h1>
+      </div>
+
+      {% else %}
       <!-- Delete Account -->
       <button
         onclick="openDeleteModal()"
@@ -54,6 +60,7 @@
           </form>
         </div>
       </div>
+      {% endif %}
     </main>
 
     <!-- Footer -->

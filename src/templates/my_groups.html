@@ -19,6 +19,13 @@
         </h1>
       </div>
     </main>
+    {% elif staff_username == 'admin' %}
+    <main class="flex-grow">
+      <div class="p-8 text-3xl font-bold text-center text-white">
+        <h1>Admins cannot use this feature.</h1>
+        <h1>Please sign in as a non-admin to view your groups.</h1>
+      </div>
+    </main>
     {% else %}
     <main class="flex-grow">
       <div class="p-8">

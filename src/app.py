@@ -117,11 +117,13 @@ def delete_account(staff_id):
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    staff_username = session.get('staff_username')
+    return render_template('about.html', staff_username=staff_username)
 
 @app.route('/my_groups')
 def my_groups():
     user_id = session.get('user_id')
+    staff_username = session.get('staff_username')
     if not user_id:
         return render_template('my_groups.html', user_id=None, groups=[])
 
@@ -133,7 +135,7 @@ def my_groups():
     user_societies = Societies.query.filter(Societies.society_id.in_(society_ids)).all()
     # groups all the society ids together to be called
 
-    return render_template('my_groups.html', user_id=user_id, groups=user_societies)
+    return render_template('my_groups.html', user_id=user_id, staff_username=staff_username, groups=user_societies)
 
 
 
@@ -177,8 +179,10 @@ def submit_group():
 def group_detail(group_id):
     group = Societies.query.get_or_404(group_id)
     user_id = session.get('user_id')
-    
+    staff_username = session.get('staff_username')
+    is_admin = (staff_username == 'admin')
     is_creator = (user_id == group.created_by) if user_id else False
+    can_delete = (is_creator or is_admin)
     # checks if the society was created by the user currently logged in
 
     today = date.today() 
@@ -232,6 +236,9 @@ def group_detail(group_id):
         group=group,
         is_member=is_member,
         is_creator=is_creator,
+        is_admin=is_admin,
+        staff_username=staff_username,
+        can_delete=can_delete,
         date_list=date_list,
         common_dates=common_dates,
         error=error
@@ -244,8 +251,12 @@ def group_detail(group_id):
 def delete_group(group_id):
     group = Societies.query.get_or_404(group_id)
     user_id = session.get('user_id')
+    staff_username = session.get('staff_username')
+    is_admin = (staff_username == 'admin')
+    is_creator = (user_id == group.created_by) if user_id else False
+    can_delete = (is_creator or is_admin)
 
-    if user_id != group.created_by:
+    if not can_delete:
         abort(403)  # Forbidden
 
     membership = Staff_Societies.query.filter_by(society_id=group_id).first()
