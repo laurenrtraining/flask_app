@@ -12,6 +12,7 @@
 
     <!-- Main Body -->
     {% if not user_id %}
+    <!-- If the user is not logged in this heading is printed -->
     <main class="flex-grow">
       <div class="p-8">
         <h1 class="text-3xl font-bold text-center text-white">
@@ -20,6 +21,7 @@
       </div>
     </main>
     {% elif staff_username == 'admin' %}
+    <!-- If the user is an admin -->
     <main class="flex-grow">
       <div class="p-8 text-3xl font-bold text-center text-white">
         <h1>Admins cannot use this feature.</h1>
@@ -27,23 +29,27 @@
       </div>
     </main>
     {% else %}
+    <!-- If the user is just a plain user then they have the ability to view all the groups they are members of instead of searching through a large selection to find their pages -->
     <main class="flex-grow">
       <div class="p-8">
         <h1 class="text-3xl font-bold text-center text-white">My Groups</h1>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 p-8">
         {% for group in groups %}
+        <!-- Looks at each group in the database individuallty and checks one by one -->
         <a
           href="{{ url_for('group_detail', group_id=group.society_id) }}"
           class="block bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition duration-300"
         >
           {% if group.image_filename %}
+          <!-- If the user added an image it is displayed here -->
           <img
             src="{{ url_for('static', filename='group_images/' + group.image_filename) }}"
             alt="{{ group.name }}"
             class="w-full h-32 object-cover rounded-t-lg"
           />
           {% else %}
+          <!-- If they didn't add an image a default image is added -->
           <img
             src="{{ url_for('static', filename='default.png') }}"
             alt="Default image"

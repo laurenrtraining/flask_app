@@ -6,12 +6,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="min-h-screen flex flex-col bg-cyan-600">
+    <!-- Uses tailwind CSS (Tailwindcss, n.d.)  -->
+
     <!-- Navbar -->
     {% include 'navbar/navbar.html' %}
 
     <!-- Main Body -->
     <main class="flex-grow max-w-5xl mx-auto mt-8">
       {% block content %}{% endblock %}
+      <!-- Calls group_detail code. This method makes it tidier -->
     </main>
 
     <!-- Footer -->

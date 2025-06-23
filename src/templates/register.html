@@ -12,6 +12,7 @@
       <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">
         Register
       </h2>
+      <!-- Creates a box popup in the middle of the page - this is a new page that can only be accessed through the sign in page -->
 
       <form
         action="{{ url_for('registration') }}"
@@ -32,11 +33,13 @@
             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+        <!-- Enter username - either real name or staff id -->
 
         <div>
           <label for="job_role" class="block text-sm font-medium text-gray-700"
             >Job Role</label
           >
+          <!-- What job role does the user have in the office - can possible be used for statistics of webpage use later -->
           <input
             type="text"
             id="job_role"
@@ -52,6 +55,7 @@
             class="block text-sm font-medium text-gray-700"
             >Email</label
           >
+          <!-- Email is needed incase users need to be contacted at some point -->
           <input
             type="email"
             id="staff_email"
@@ -66,7 +70,7 @@
           <label for="password" class="block text-sm font-medium text-gray-700"
             >Password</label
           >
-
+          <!-- Choose password -->
           <input
             type="password"
             id="password"
@@ -106,6 +110,7 @@
         <a href="\sign_in.html" class="text-blue-600 hover:underline"
           >Sign in</a
         >
+        <!-- Links back to sign in page -->
       </p>
     </div>
   </body>
@@ -122,6 +127,7 @@
 <!-- Code to create error popup -->
 {% if error %}
 <style>
+  /* Keyframes enables the sliding movement up and down (W3Schools, 2024) */
   @keyframes slideUp {
     0% {
       transform: translate(-50%, 100%);
@@ -133,6 +139,7 @@
     }
   }
 
+  /* Alert box has both a timeout dismissal and a button to close it */
   #alert {
     position: fixed;
     bottom: 20px;
