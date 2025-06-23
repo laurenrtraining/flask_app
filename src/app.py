@@ -206,13 +206,13 @@ def group_detail(group_id):
             selected_dates = set(request.form.getlist('available_dates'))
 
              # Clear old availability entries for this user in this group
-            Date_Availability.query.filter_by(user_id=user_id, group_id=group_id).delete()
+            Date_Availability.query.filter_by(staff_id=user_id, society_id=group_id).delete()
 
             # Add new entries
             for date_str in selected_dates:
                 new_entry = Date_Availability(
-                    group_id=group_id,
-                    user_id=user_id,
+                    society_id=group_id,
+                    staff_id=user_id,
                     available_dates=date_str  # assuming it's stored as a string in your model
                 )
                 db.session.add(new_entry)
@@ -221,10 +221,10 @@ def group_detail(group_id):
 
     # Calculate common dates for display
     availability = defaultdict(set)
-    entries = Date_Availability.query.filter_by(group_id=group_id).all()
+    entries = Date_Availability.query.filter_by(society_id=group_id).all()
 
     for entry in entries:
-        availability[entry.user_id].add(entry.available_dates)
+        availability[entry.staff_id].add(entry.available_dates)
 
     if availability:
         common_dates = set.intersection(*availability.values())
@@ -233,7 +233,8 @@ def group_detail(group_id):
 
     return render_template(
         'society_template/group_detail.html',
-        group=group,
+        group = Societies.query.get_or_404(group_id),
+        user_id=session.get('user_id'),
         is_member=is_member,
         is_creator=is_creator,
         is_admin=is_admin,
@@ -241,7 +242,7 @@ def group_detail(group_id):
         can_delete=can_delete,
         date_list=date_list,
         common_dates=common_dates,
-        error=error
+        error=error,
     )
 
 
@@ -267,6 +268,39 @@ def delete_group(group_id):
     db.session.delete(group)
     db.session.commit()
     return redirect(url_for('index'))  # Return to homepage
+
+
+### ADDING AN ANNOUNCEMENT TO GROUP PAGE AND DATABASE ###
+
+@app.route('/group/<int:group_id>/announcement', methods=['POST'])
+def announcement(group_id):
+    group = Societies.query.get_or_404(group_id)
+    user_id = session.get('user_id')
+    staff_username = session.get('staff_username')
+    is_admin = (staff_username == 'admin')
+    is_creator = (user_id == group.created_by) if user_id else False
+    can_delete = (is_creator or is_admin)
+
+    if not can_delete:
+        abort(403)  # Forbidden
+
+    # Save to database
+    new_announcement = request.form.get('announcement','').strip()
+
+    if new_announcement:
+        group.announcement = new_announcement
+        db.session.commit()
+
+    return redirect(url_for('group_detail',
+        group_id=group_id,
+        is_creator=is_creator,
+        is_admin=is_admin,
+        staff_username=staff_username,
+        can_delete=can_delete,
+        new_announcement=group.announcement)) 
+
+    # db.session.(announcement)
+    # GET THIS TO APPEND TO DATABASE!!!!
 
 
 ### JOIN AND LEAVE GROUPS ###
