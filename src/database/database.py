@@ -23,6 +23,7 @@ class Societies(db.Model):
     description = db.Column(db.String(200), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('staff.staff_id'), nullable=False)
     image_filename = db.Column(db.String(200), nullable=True)  # stores image filepath
+    announcement = db.Column(db.String(200), nullable=True)
 
 
 class Staff_Societies(db.Model):

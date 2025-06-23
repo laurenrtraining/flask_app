@@ -1,6 +1,6 @@
 <!-- society_template/group_detail.html -->
 {% extends "society_template/base.html" %} {% block content %}
-<main class="flex-grow">
+<main class="flex-grow space-y-6">
   <div class="p-8">
     <h1 class="text-3xl font-bold text-center text-white">{{group.name}}</h1>
   </div>
@@ -9,7 +9,7 @@
   <!-- If user is not signed in, do not render the Join/Leave society button -->
 
   <!-- If user is not the creator of the page not are they admins -->
-  {% if not is_creator %}
+  {% if not can_delete %}
 
   <!-- Join/Leave Society button -->
   {% if is_member %}
@@ -98,6 +98,71 @@
   </div>
   {% endif %} {% endif %} {% endif %}
 
+  <!-- Pinned messages go here -->
+  <div
+    class="bg-white p-8 rounded-xl shadow max-w-3xl w-full shadow-md ml-auto"
+  >
+    <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-3 mb-4">
+      <strong class="text-yellow-800">📌 Pinned:</strong>
+      <span id="pinnedMessage" class="text-yellow-700">
+        {% if group.announcement is none %} Only Admins and Group Creators can
+        add mesages here. Keep an eye out for new announcements! {% else %}
+        {{group.announcement}} {% endif %}
+      </span>
+    </div>
+
+    {% if can_delete %}
+    <button
+      type="submit"
+      onclick="openAnnouncementModal()"
+      class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+    >
+      Create new announcement
+    </button>
+
+    <!-- Modal for entering announcement -->
+    <div
+      id="announcementModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden"
+    >
+      <div
+        class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md text-center"
+      >
+        <h2 class="text-xl font-bold mb-4">Enter your message</h2>
+        <!-- Text area to enter announcement -->
+
+        <form
+          method="POST"
+          action="{{ url_for('announcement', group_id=group.society_id) }}"
+          class="px-4 py-2"
+        >
+          <textarea
+            type="text"
+            id="announcement"
+            name="announcement"
+            placeholder="Announcement"
+            class="mt-1 block w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          ></textarea>
+          <button
+            type="submit"
+            class="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700 mr-2"
+          >
+            Confirm Announcement
+          </button>
+          <button
+            type="button"
+            onclick="closeAnnouncementModal()"
+            class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Calendar created here -->
   <div class="max-w-3xl w-full bg-white shadow-md rounded-xl p-8 ml-auto">
     <h1 class="text-3xl font-bold text-center text-cyan-700 mb-6">
       Group Availability Calendar
@@ -209,6 +274,9 @@
     function openLeaveModal() {
       document.getElementById("confirmLeaveModal").classList.remove("hidden");
     }
+    function openAnnouncementModal() {
+      document.getElementById("announcementModal").classList.remove("hidden");
+    }
 
     function closeModal() {
       document.getElementById("confirmModal").classList.add("hidden");
@@ -218,6 +286,9 @@
     }
     function closeLeaveModal() {
       document.getElementById("confirmLeaveModal").classList.add("hidden");
+    }
+    function closeAnnouncementModal() {
+      document.getElementById("announcementModal").classList.add("hidden");
     }
   </script>
 </main>
