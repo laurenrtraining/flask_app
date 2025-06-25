@@ -40,13 +40,16 @@
             >Job Role</label
           >
           <!-- What job role does the user have in the office - can possible be used for statistics of webpage use later -->
-          <input
-            type="text"
+          <select
             id="job_role"
             name="job_role"
             required
             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          >
+            <option value="" disabled selected>-- Select Role --</option>
+            <option value="Admin">Admin</option>
+            <option value="Non-admin">Non Admin</option>
+          </select>
         </div>
 
         <div>

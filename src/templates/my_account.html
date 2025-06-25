@@ -16,7 +16,7 @@
         <h1 class="text-3xl font-bold">Hello {{staff_username}}</h1>
       </div>
 
-      {% if staff_username == 'admin' %}
+      {% if job_role == 'Admin' %}
       <!-- If the user is the admin, they cannot delete their account - saves against accidental deletion -->
       <div class="p-8">
         <h1 class="text-3xl font-bold">Admins cannot delete their account</h1>

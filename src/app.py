@@ -213,11 +213,11 @@ def submit_group():
 def group_detail(group_id):
     group = Societies.query.get_or_404(group_id)
     user_id = session.get('user_id')
-    staff_username = session.get('staff_username')
+    job_role = session.get('job_role')
     # Checks user exists, that the user_id and staff_username exist
     # Both will be needed later
 
-    is_admin = (staff_username == 'admin')
+    is_admin = (job_role == 'Admin')
     is_creator = (user_id == group.created_by) if user_id else False
     can_delete = (is_creator or is_admin)
     # checks if the society was created by the user currently logged in
@@ -281,7 +281,7 @@ def group_detail(group_id):
         is_member=is_member,
         is_creator=is_creator,
         is_admin=is_admin,
-        staff_username=staff_username,
+        job_role=job_role,
         can_delete=can_delete,
         date_list=date_list,
         common_dates=common_dates,
@@ -296,8 +296,8 @@ def group_detail(group_id):
 def delete_group(group_id):
     group = Societies.query.get_or_404(group_id)
     user_id = session.get('user_id')
-    staff_username = session.get('staff_username')
-    is_admin = (staff_username == 'admin')
+    job_role = session.get('job_role')
+    is_admin = (job_role == 'Admin')
     is_creator = (user_id == group.created_by) if user_id else False
     can_delete = (is_creator or is_admin)
 
@@ -323,8 +323,8 @@ def delete_group(group_id):
 def announcement(group_id):
     group = Societies.query.get_or_404(group_id)
     user_id = session.get('user_id')
-    staff_username = session.get('staff_username')
-    is_admin = (staff_username == 'admin')
+    job_role = session.get('job_role')
+    is_admin = (job_role == 'Admin')
     is_creator = (user_id == group.created_by) if user_id else False
     can_delete = (is_creator or is_admin)
 
@@ -344,7 +344,7 @@ def announcement(group_id):
         group_id=group_id,
         is_creator=is_creator,
         is_admin=is_admin,
-        staff_username=staff_username,
+        job_role=job_role,
         can_delete=can_delete,
         new_announcement=group.announcement)) 
 

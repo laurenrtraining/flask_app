@@ -18,12 +18,12 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
 
-        # Check if admin user already exists.
+        # Check if a single admin user already exists, other admins can be added during registration later.
         admin = Staff.query.filter_by(staff_username='admin').first()
         if not admin:
             admin_user = Staff(
             staff_username='admin',
-            job_role='admin',
+            job_role='Admin',
             staff_email='admin@staff.uk',
             password='admin123'
         )

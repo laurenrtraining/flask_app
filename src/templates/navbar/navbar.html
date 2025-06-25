@@ -38,7 +38,7 @@
       </div>
 
       <div class="flex items-center sm:space-x-8">
-        {% if 'user_id' in session %} {% if staff_username == 'admin' %}
+        {% if 'user_id' in session %} {% if job_role == 'Admin' %}
         <!-- If the user is logged in and said user is an admin... -->
         <a
           href="/my_account"
