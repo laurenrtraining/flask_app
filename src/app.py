@@ -37,8 +37,8 @@ app.secret_key = os.urandom(24)
 @app.route('/')
 def index():
     groups = Societies.query.all()
-    staff_username = session.get('staff_username')
-    return render_template('index.html', groups=groups, staff_username=staff_username)
+    job_role = session.get('job_role')
+    return render_template('index.html', groups=groups, job_role=job_role)
 # Shows 'create group' if users are signed in and displays all groups in existence
 
 # Render sign in page
@@ -54,6 +54,7 @@ def sign_in():
         if user and user.password == password:
             session['user_id'] = user.staff_id
             session['staff_username'] = user.staff_username
+            session['job_role'] = user.job_role
             return redirect(url_for('index')) 
             # these call route through the name of the funtion, not the html route - makes the code tidier
         else:
@@ -89,9 +90,10 @@ def registration():
         db.session.commit()
 
         user = Staff.query.filter_by(staff_username=username).first()
-        # Checks that the user exists not they have been added to database
+        # Checks that the user exists now they have been added to database
         session['user_id'] = user.staff_id
         session['staff_username'] = user.staff_username
+        session['job_role'] = user.job_role
         return redirect(url_for('index'))  
         # Logs the user in successfully
     
@@ -112,9 +114,10 @@ def logout():
 def my_account():
     user_id = session.get('user_id')
     staff_username = session.get('staff_username')
+    job_role = session.get('job_role')
     staff = Staff.query.get(user_id)
 
-    return render_template('my_account.html', staff=staff, staff_username=staff_username)
+    return render_template('my_account.html', staff=staff, staff_username=staff_username, job_role=job_role)
     # Account page is rendered
 
 @app.route('/staff/<int:staff_id>/delete', methods=['POST'])
@@ -151,7 +154,7 @@ def messages():
 @app.route('/my_groups')
 def my_groups():
     user_id = session.get('user_id')
-    staff_username = session.get('staff_username')
+    job_role = session.get('job_role')
     # If the user is not logged in it shows no groups
     if not user_id:
         return render_template('my_groups.html', user_id=None, groups=[])
@@ -164,7 +167,7 @@ def my_groups():
     user_societies = Societies.query.filter(Societies.society_id.in_(society_ids)).all()
     # Groups all the society ids together to be called
 
-    return render_template('my_groups.html', user_id=user_id, staff_username=staff_username, groups=user_societies)
+    return render_template('my_groups.html', user_id=user_id, job_role=job_role, groups=user_societies)
     # Calls all existing societies that the user logged in is a member of and displays them
 
 
@@ -214,8 +217,7 @@ def group_detail(group_id):
     group = Societies.query.get_or_404(group_id)
     user_id = session.get('user_id')
     job_role = session.get('job_role')
-    # Checks user exists, that the user_id and staff_username exist
-    # Both will be needed later
+    # Checks user exists, that the user_id and whether the job_role is admin or not
 
     is_admin = (job_role == 'Admin')
     is_creator = (user_id == group.created_by) if user_id else False

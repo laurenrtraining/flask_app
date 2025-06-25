@@ -9,7 +9,7 @@ my-venv\Scripts\activate
 
 # Step 2: Run pip install
 
-pip install requirements.txt
+pip install src/requirements.txt
 
 # Step 3: Run the program
 
