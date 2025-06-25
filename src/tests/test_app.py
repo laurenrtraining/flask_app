@@ -32,24 +32,6 @@ def test_render_index_when_logged_out(client):
     assert response.status_code == 200
     assert b'Guest' in response.data
 
-# TESTS THAT USER REGISTRATION SUCCESSFULLY HITS AND ADDS TO THE DATABASE
-def test_user_registration(client):
-    # Gets to the sign in page first
-    response = client.get('/sign_in.html')
-    assert response.status_code == 200
-
-    # Confirm registration option is on the page
-    assert b'Register' in response.data
-
-    # Simulates clicking registration button
-    response = client.get('/register.html')
-    assert response.status_code == 200
-    assert b'Registration Form' in response.data
-
-    client.post('/register.html', data={'staff_username':'test_user', 'job_role':'test_role', 'staff_email':'test_user@staff.uk', 'password':'testUser123'}, follow_redirects=True)
-    
-    assert response.status_code == 200
-
 
 # TESTS THAT USER CAN SIGN IN SUCCESSFULLY AND THAT THE DB SEARCH WORKS
 def test_user_sign_in_success(client):
@@ -61,16 +43,85 @@ def test_user_sign_in_success(client):
     
     assert response.status_code == 200
 
-# TESTS THAT VALIDATION WORKS BY IMPUTTING INCORRECT PASSWORD
+# TESTS THAT VALIDATION WORKS BY INPUTTING INCORRECT PASSWORD
 def test_user_sign_in_fail(client):
     # Gets to the sign in page first
     response = client.get('/sign_in.html')
     assert response.status_code == 200
 
-    client.post('/sign_in.html', data={'staff_username':'test_user', 'password':'wrongPassword123'}, follow_redirects=True)
+    staff = Staff(staff_username='test_user', job_role='test_role', staff_email='test_user@staff.uk', password='testUser123')
+    db.session.add(staff)
+    db.session.commit()
+
+    response = client.post('/sign_in.html', data={'staff_username':'test_user', 'password':'wrongPassword123'}, follow_redirects=True)
     
     assert response.status_code == 200
     assert b'Invalid username or password' in response.data
 
 
-    # THIS TEST CURRENTLY ERRORS, TRYING TO WORK OUT WHY
+# TESTS THAT USER REGISTRATION SUCCESSFULLY HITS AND ADDS TO THE DATABASE
+def test_user_registration_if_existing(client):
+    # Gets to the sign in page first
+    response = client.get('/sign_in.html')
+    assert response.status_code == 200
+
+    staff = Staff(staff_username='test_user', job_role='test_role', staff_email='test_user@staff.uk', password='testUser123')
+    db.session.add(staff)
+    db.session.commit()
+
+    # Confirm registration option is on the page
+    assert b'Register' in response.data
+
+    # Simulates clicking registration button
+    response = client.get('/register.html')
+    assert response.status_code == 200
+    assert b'Registration Form' in response.data
+
+    response = client.post('/register.html', data={'staff_username':'test_user1', 'job_role':'test_role2', 'staff_email':'test_user@staff.uk', 'password':'testUser1234'}, follow_redirects=True)
+    
+    assert response.status_code == 200
+    assert b'Email already registered. Please sign in.' in response.data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# # Just do a couple of tests
+# # Pics of the tests
+# # testing approach
+# # # Example screenshot
+
+
+# # If a regular non admin user is signed in, does the word Account appear where 'guest' used to be?
+# # Does the create group popup occur when 'create group button' is pressed?
+# # Does submitting the create group mean it is added to db and successfully renders on the home page?
+# # If the user clicks on the group they just made, is the delete button visible?
+# # If user clicks siad delete button does a modal pop up fro confirmation? does this the remove the group from the home page?
+# # if the user joins other groups, are those specific groups visible in the my_groups section?
+# # If the user selects a group that they didn't make, does the join society button appear? if they are already a member does it show the leave button?
+
+# # Does the calendar allow users to add the dates they are abailable?
+# # if antoehr user adds dates afterwards, does this update to the new date availabilities?
+
+# # If the users on the account is the creator, can they add an announcement that is visible for everyone?
+# # If the user selects the account and presses delete, does their account get deleted from the fatabase?
+
+# # if user is admin, does account page say they cant delete account and dfoes the groups page say they need to log in as not an admin
+# # Can admins delete every society?
+# # can admins add announcements to ANY sciety?
+
+# # Does message page render?
+

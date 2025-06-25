@@ -57,7 +57,7 @@ def sign_in():
             return redirect(url_for('index')) 
             # these call route through the name of the funtion, not the html route - makes the code tidier
         else:
-            # If usernae or password is incorrect or doesn't exist it throws an error
+            # If username or password is incorrect or doesn't exist it throws an error
             return render_template('sign_in.html', error="Invalid username or password")
         
     return render_template('sign_in.html')
