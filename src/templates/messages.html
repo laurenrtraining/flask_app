@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About Us</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen flex flex-col bg-cyan-600">
+    <!-- Navbar -->
+    {% include 'navbar/navbar.html' %}
+
+    <!-- Main Body -->
+    <main class="flex-grow mx-auto px-4 py-1 text-white text-center">
+      <div class="p-8">
+        <h1 class="text-3xl font-bold">Messages</h1>
+      </div>
+
+      <section class="mb-10">
+        <h2 class="text-2xl font-semibold mb-4">
+          This feature was a part of the MoSCoW featured I could have added,
+          however this implementation was not feasible due to time constraints.
+        </h2>
+        <br />
+        <h2 class="text-2xl font-semibold mb-4">
+          I wanted to focus more on the CRUD areas of the database for users and
+          admin, and this feature would have required a 5th table in the
+          database, which was out of scope for this project.
+        </h2>
+        <br />
+        <h2 class="text-2xl font-semibold mb-4">
+          If I was to develop this in the future, this would definitely be a
+          feature I would like to implement.
+        </h2>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    {% include 'footer/footer.html' %}
+  </body>
+</html>

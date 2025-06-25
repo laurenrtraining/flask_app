@@ -143,6 +143,11 @@ def about():
     return render_template('about.html')
     # Shows the about page
 
+@app.route('/messages')
+def messages():
+    return render_template('messages.html')
+    # Shows the about page
+
 @app.route('/my_groups')
 def my_groups():
     user_id = session.get('user_id')
