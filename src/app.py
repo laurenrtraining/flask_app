@@ -423,7 +423,7 @@ def group_detail(group_id):
                 new_entry = Date_Availability(
                     society_id=group_id,
                     staff_id=user_id,
-                    available_dates=date_to_store,  # assuming it's stored as a string in your model
+                    calendar_dates=date_to_store,  # assuming it's stored as a string in your model
                 )
                 db.session.add(new_entry)
                 # Add date availabilities to database
@@ -436,7 +436,7 @@ def group_detail(group_id):
     # Finds all date entries for the selected society
 
     for entry in entries:
-        availability[entry.staff_id].add(entry.available_dates)
+        availability[entry.staff_id].add(entry.calendar_dates)
         # Loops through every entry one at a time
 
     if availability:
