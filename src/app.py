@@ -115,11 +115,14 @@ def logout():
 @app.route('/my_account')
 def my_account():
     user_id = session.get('user_id')
-    staff = Staff.query.get(user_id)
+    staff = db.session.get(Staff, user_id)
     staff_username = session.get('staff_username')
     job_role = session.get('job_role')
     success = request.args.get('success') 
     # Gets any success messages from other functions
+
+    if staff is None:
+        abort(404)
 
     return render_template('my_account.html', staff=staff, staff_username=staff_username, job_role=job_role, success=success)
     # Account page is rendered
@@ -168,7 +171,10 @@ def update_group(group_id):
     if not user_id:
         return redirect(url_for('sign_in'))
 
-    group = Societies.query.get_or_404(group_id)
+    group = db.session.get(Societies, group_id)
+
+    if group is None:
+        abort(404)
 
     if request.method == 'POST':
         name = request.form.get('name').strip()
@@ -205,7 +211,7 @@ def update_group(group_id):
 
 @app.route('/staff/<int:staff_id>/delete', methods=['POST'])
 def delete_account(staff_id):
-    staff = Staff.query.get_or_404(staff_id)
+    staff = db.session.get(Staff, staff_id)
 
     # If this member of staff is a part of any groups this ensures that they are removed from the group too
     membership = Staff_Societies.query.filter_by(society_id=staff_id).first()
@@ -302,7 +308,7 @@ def submit_group():
 
 @app.route('/group/<int:group_id>', methods=['GET', 'POST'])
 def group_detail(group_id):
-    group = Societies.query.get_or_404(group_id)
+    group = db.session.get(Societies, group_id)
     user_id = session.get('user_id')
     job_role = session.get('job_role')
     # Checks user exists, that the user_id and whether the job_role is admin or not
@@ -318,6 +324,9 @@ def group_detail(group_id):
     # In the form (abbreviated day, date, month) and spans 31 days (1 month)
 
     error = None  # default no error
+
+    if group is None:
+        abort(404)
 
     # Is user already a member of this group?
     is_member = False
@@ -368,7 +377,7 @@ def group_detail(group_id):
 
     return render_template(
         'society_template/group_detail.html',
-        group = Societies.query.get_or_404(group_id),
+        group = db.session.get(Societies, group_id),
         user_id=session.get('user_id'),
         is_member=is_member,
         is_creator=is_creator,
@@ -387,12 +396,15 @@ def group_detail(group_id):
 
 @app.route('/group/<int:group_id>/delete', methods=['POST'])
 def delete_group(group_id):
-    group = Societies.query.get_or_404(group_id)
+    group = db.session.get(Societies, group_id)
     user_id = session.get('user_id')
     job_role = session.get('job_role')
     is_admin = (job_role == 'Admin')
     is_creator = (user_id == group.created_by) if user_id else False
     can_delete = (is_creator or is_admin)
+
+    if group is None:
+        abort(404)
 
     if not can_delete:
         abort(403)  # Forbidden
@@ -414,13 +426,16 @@ def delete_group(group_id):
 
 @app.route('/group/<int:group_id>/announcement', methods=['POST'])
 def announcement(group_id):
-    group = Societies.query.get_or_404(group_id)
+    group = db.session.get(Societies, group_id)
     user_id = session.get('user_id')
     job_role = session.get('job_role')
     is_admin = (job_role == 'Admin')
     is_creator = (user_id == group.created_by) if user_id else False
     can_delete = (is_creator or is_admin)
 
+    if group is None:
+        abort(404)
+        
     if not can_delete:
         abort(403)  # Forbidden
 
