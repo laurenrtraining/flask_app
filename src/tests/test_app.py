@@ -33,15 +33,35 @@ def test_render_index_when_logged_out(client):
     assert b'Guest' in response.data
 
 
-# TESTS THAT USER CAN SIGN IN SUCCESSFULLY AND THAT THE DB SEARCH WORKS
-def test_user_sign_in_success(client):
+# TESTS THAT USER CAN SIGN IN AS NON ADMIN SUCCESSFULLY AND THAT THE DB SEARCH WORKS
+def test_user_sign_in_success_NON_ADMIN(client):
     # Gets to the sign in page first
     response = client.get('/sign_in.html')
     assert response.status_code == 200
 
-    client.post('/sign_in.html', data={'staff_username':'test_user', 'password':'testUser123'}, follow_redirects=True)
+    staff = Staff(staff_username='test_user', job_role='Non Admin', staff_email='test_user@staff.uk', password='testUser123')
+    db.session.add(staff)
+    db.session.commit()
+
+    response = client.post('/sign_in.html', data={'staff_username':'test_user', 'password':'testUser123'}, follow_redirects=True)
     
     assert response.status_code == 200
+    assert b'Account' in response.data
+
+# TESTS THAT USER CAN SIGN IN AS ADMIN SUCCESSFULLY AND THAT THE DB SEARCH WORKS
+def test_user_sign_in_success_ADMIN(client):
+    # Gets to the sign in page first
+    response = client.get('/sign_in.html')
+    assert response.status_code == 200
+
+    staff = Staff(staff_username='test_user2', job_role='Admin', staff_email='test_user2@staff.uk', password='testUser456')
+    db.session.add(staff)
+    db.session.commit()
+
+    response = client.post('/sign_in.html', data={'staff_username':'test_user2', 'password':'testUser456'}, follow_redirects=True)
+    
+    assert response.status_code == 200
+    assert b'Admin Account' in response.data
 
 # TESTS THAT VALIDATION WORKS BY INPUTTING INCORRECT PASSWORD
 def test_user_sign_in_fail(client):
@@ -84,6 +104,33 @@ def test_user_registration_if_existing(client):
 
 
 
+# TESTS THAT USERS CAN CREATE NEW GROUPS
+def test_create_groups(client):
+    # Logs in a user
+    staff = Staff(staff_username='test_user', job_role='Non Admin', staff_email='test_user@staff.uk', password='testUser123')
+    db.session.add(staff)
+    db.session.commit()
+
+    response = client.post('/sign_in.html', data={'staff_username':'test_user', 'password':'testUser123'}, follow_redirects=True)
+    assert response.status_code == 200
+    #  Log in successful
+
+    # Simulates staff session
+    staff_id = staff.staff_id
+
+    with client.session_transaction() as session:
+        session['user_id'] = staff_id
+        session['staff_username'] = staff.staff_username
+        session['job_role'] = staff.job_role
+
+    # Gets to create group page
+    response = client.post('/submit-group', data={'name':'test_group', 'description':'test description'}, follow_redirects=True)
+    assert response.status_code == 200
+
+    response = client.get('/')
+    assert response.status_code == 200
+    assert b'test_group' in response.data
+    # Creates new group successfully
 
 
 
@@ -105,10 +152,7 @@ def test_user_registration_if_existing(client):
 # # # Example screenshot
 
 
-# # If a regular non admin user is signed in, does the word Account appear where 'guest' used to be?
-# # Does the create group popup occur when 'create group button' is pressed?
-# # Does submitting the create group mean it is added to db and successfully renders on the home page?
-# # If the user clicks on the group they just made, is the delete button visible?
+# # I)f the user clicks on the group they just made, is the delete button visible?
 # # If user clicks siad delete button does a modal pop up fro confirmation? does this the remove the group from the home page?
 # # if the user joins other groups, are those specific groups visible in the my_groups section?
 # # If the user selects a group that they didn't make, does the join society button appear? if they are already a member does it show the leave button?
