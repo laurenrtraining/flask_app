@@ -77,15 +77,19 @@
     {% include 'footer/footer.html' %}
 
     <script>
+      // Modal was created using code from (W3Schools, 2025)
+      // Modal functions to open and close the functions are here
       function openDeleteModal() {
         document
           .getElementById("confirmDeleteModal")
           .classList.remove("hidden");
       }
+      // Removing hidden makes modal visible
 
       function closeDeleteModal() {
         document.getElementById("confirmDeleteModal").classList.add("hidden");
       }
+      // Adding hidden hides modal again
     </script>
   </body>
 </html>

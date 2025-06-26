@@ -18,6 +18,7 @@
             class="block text-sm font-medium text-gray-700"
             >Username</label
           >
+          <!-- Enter username -->
           <input
             type="text"
             id="staff_username"
@@ -31,6 +32,7 @@
           <label for="password" class="block text-sm font-medium text-gray-700"
             >Password</label
           >
+          <!-- Enter password -->
           <input
             type="password"
             id="password"
@@ -62,11 +64,12 @@
         <a href="register.html" class="text-blue-600 hover:underline"
           >Register</a
         >
+        <!-- Links to registration form -->
       </p>
     </div>
   </body>
 
-  <!-- Show password function -->
+  <!-- Show password function - users can check their password is correct before submitting -->
   <script>
     function togglePassword() {
       const pwd = document.getElementById("password");
@@ -78,6 +81,7 @@
 <!-- Code to create error popup -->
 {% if error %}
 <style>
+  /* Keyframes enables the sliding movement up and down (W3Schools, 2024) */
   @keyframes slideUp {
     0% {
       transform: translate(-50%, 100%);
@@ -89,6 +93,7 @@
     }
   }
 
+  /* Alert box has both a timeout dismissal and a button to close it */
   #alert {
     position: fixed;
     bottom: 20px;

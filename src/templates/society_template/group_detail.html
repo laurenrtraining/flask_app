@@ -3,6 +3,7 @@
 <main class="flex-grow space-y-6">
   <div class="p-8">
     <h1 class="text-3xl font-bold text-center text-white">{{group.name}}</h1>
+    <!-- Uses tailwind CSS (Tailwindcss, n.d.)  -->
   </div>
 
   <!-- Pinned messages go here -->
@@ -16,9 +17,11 @@
         add mesages here. Keep an eye out for new announcements! {% else %}
         {{group.announcement}} {% endif %}
       </span>
+      <!-- If the announcement fiels of the database is populated, the announcement will be shown here, if not it shows a temporary statement until the admin or group creator adds an announcement  -->
     </div>
 
     {% if can_delete %}
+    <!-- can_delete means they are either an admin or the groups creator - this just combines it -->
     <button
       type="submit"
       onclick="openAnnouncementModal()"
@@ -176,19 +179,21 @@
             placeholder="Announcement"
             class="mt-1 block w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           ></textarea>
-          <button
-            type="submit"
-            class="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700 mr-2"
-          >
-            Confirm Announcement
-          </button>
-          <button
-            type="button"
-            onclick="closeAnnouncementModal()"
-            class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-          >
-            Cancel
-          </button>
+          <div class="mt-4 flex justify-center">
+            <button
+              type="submit"
+              class="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700 mr-2"
+            >
+              Confirm Announcement
+            </button>
+            <button
+              type="button"
+              onclick="closeAnnouncementModal()"
+              class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -297,7 +302,9 @@
   </div>
 
   <!-- Script for modal -->
+  <!-- Modal was created using code from (W3Schools, 2025) -->
   <script>
+    // This uses JavaScript to help trigger additional functions like the modal that can't be done using HTML alone
     function openModal() {
       document.getElementById("confirmModal").classList.remove("hidden");
     }
@@ -311,6 +318,9 @@
     function openAnnouncementModal() {
       document.getElementById("announcementModal").classList.remove("hidden");
     }
+
+    // Above all remove the hidden feature (ensures modal is visible)
+    // Below adds hidden feature again (hides modal)
 
     function closeModal() {
       document.getElementById("confirmModal").classList.add("hidden");
@@ -328,9 +338,10 @@
 </main>
 {% endblock %}
 
-<!-- Code to create error popup -->
+<!-- Code to create error popup - used in multiple pages -->
 {% if error %}
 <style>
+  /* Keyframes enables the sliding movement up and down (W3Schools, 2024) */
   @keyframes slideUp {
     0% {
       transform: translate(-50%, 100%);
@@ -342,6 +353,7 @@
     }
   }
 
+  /* Alert box has both a timeout dismissal and a button to close it */
   #alert {
     position: fixed;
     bottom: 20px;

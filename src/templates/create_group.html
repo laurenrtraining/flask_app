@@ -18,6 +18,7 @@
         <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">
           Create Group
         </h2>
+        <!-- This is the modal for the create group section -->
 
         <form
           action="{{ url_for('submit_group') }}"
@@ -37,6 +38,7 @@
               required
               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            <!-- Text input for group name -->
           </div>
           <div>
             <label for="name" class="block text-sm font-medium text-gray-700"
@@ -49,10 +51,12 @@
               placeholder="Description"
               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             ></textarea>
+            <!-- Text input for description - this can be left empty -->
           </div>
           <div>
             <input type="file" name="image_filename" />
           </div>
+          <!-- An image can be added - if no image, a default one is added -->
           <div>
             <button
               type="submit"

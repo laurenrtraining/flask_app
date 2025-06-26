@@ -50,6 +50,7 @@
 
       <!-- Create Group Button - Only shows if user is logged in -->
       {% if session['user_id'] %}
+      <!-- If user is signed in then create group option shows on homepage -->
       <a href="{{ url_for('create_group') }}">
         <button
           class="fixed bottom-16 right-4 bg-cyan-800 text-white px-4 py-2 rounded-full shadow-lg hover:bg-cyan-700"
@@ -68,6 +69,7 @@
 <!-- Code to create success message popup -->
 {% if success %}
 <style>
+  /* Keyframes enables the sliding movement up and down (W3Schools, 2024) */
   @keyframes slideUp {
     0% {
       transform: translate(-50%, 100%);
@@ -78,6 +80,8 @@
       opacity: 1;
     }
   }
+
+  /* Alert box has both a timeout dismissal and a button to close it */
 
   #alert {
     position: fixed;
