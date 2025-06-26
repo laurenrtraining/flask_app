@@ -69,3 +69,66 @@
     {% include 'footer/footer.html' %}
   </body>
 </html>
+
+<!-- Code to create success message popup -->
+{% if error %}
+<style>
+  @keyframes slideUp {
+    0% {
+      transform: translate(-50%, 100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+  }
+
+  #alert {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f44336;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 300px;
+    animation: slideUp 0.5s ease-out;
+  }
+</style>
+
+<div id="alert">
+  <span>{{ error }}</span>
+  <button
+    onclick="closeAlert()"
+    style="
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      margin-left: 16px;
+      cursor: pointer;
+    "
+  >
+    &times;
+  </button>
+</div>
+
+<script>
+  function closeAlert() {
+    const alert = document.getElementById("alert");
+    if (alert) {
+      alert.style.display = "none";
+    }
+  }
+
+  // Auto-close after 5 seconds
+  setTimeout(closeAlert, 5000);
+</script>
+{% endif %}

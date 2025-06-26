@@ -273,6 +273,11 @@ def submit_group():
     filename='default.png'
     # This is the default image - stored in 'static/group_images'
 
+    name_exists = Societies.query.filter_by(name=name).first()
+    # Checks if Society name already exists
+    if name_exists:
+            return render_template('create_group.html', error="This Society already exists, you are making a duplicate.")
+
     if image and image.filename != '':
         filename = secure_filename(image.filename)
         image.save(os.path.join(app.static_folder, 'group_images', filename))
