@@ -120,7 +120,7 @@ def my_account():
     return render_template('my_account.html', staff=staff, staff_username=staff_username, job_role=job_role)
     # Account page is rendered
 
-### EDITING GROUPS IN THE DATABASE ###
+### EDITING ACCOUNTS IN THE DATABASE ###
 
 @app.route('/update_account', methods=['GET','POST'])
 def update_account():
