@@ -18,21 +18,4 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
 
-        # Check if a single admin user already exists, other admins can be added during registration later.
-        admin = Staff.query.filter_by(staff_username='admin').first()
-        if not admin:
-            admin_user = Staff(
-            staff_username='admin',
-            job_role='Admin',
-            staff_email='admin@staff.uk',
-            password='admin123'
-        )
-            db.session.add(admin_user)
-            db.session.commit()
-        else:
-            print("Admin user already exists.")
-            # This will never be hit as this initialisation of database should only be run one to create database
-
-
-
 # Only run once to initialise database

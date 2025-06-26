@@ -6,102 +6,6 @@
     <!-- Uses tailwind CSS (Tailwindcss, n.d.)  -->
   </div>
 
-  {% if user_id %}
-  <!-- If user is not signed in, do not render the Join/Leave society button -->
-
-  <!-- If user is not the creator of the page nor are they admins -->
-  {% if not can_delete %}
-
-  <!-- Join/Leave Society button -->
-  {% if is_member %}
-  <!-- If already a member, they have the option to leave -->
-  <div class="fixed bottom-16 right-4">
-    <button
-      onclick="openLeaveModal()"
-      class="bg-amber-600 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-700"
-    >
-      Leave Society
-    </button>
-  </div>
-
-  <!-- Confirmation of leave society pop up -->
-  <!-- Modal was created using code from (W3Schools, 2025) -->
-  <div
-    id="confirmLeaveModal"
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
-  >
-    <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md text-center">
-      <h2 class="text-xl font-bold mb-4">Are you sure?</h2>
-      <p class="mb-6">
-        This will remove you from this society and will be removed from the My
-        Groups section of the website
-      </p>
-      <form
-        method="POST"
-        action="{{ url_for('leave_group', group_id=group.society_id) }}"
-      >
-        <!-- This action enables removal of society from db by being called in the app.py -->
-        <button
-          type="submit"
-          class="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700 mr-2"
-        >
-          Confirm Deletion
-        </button>
-        <button
-          type="button"
-          onclick="closeLeaveModal()"
-          class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-        >
-          Cancel
-        </button>
-      </form>
-    </div>
-  </div>
-  {% else %}
-  <!-- If not already a member, they can join the society -->
-  <div class="fixed bottom-16 right-4">
-    <button
-      onclick="openJoinModal()"
-      class="bg-amber-600 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-700"
-    >
-      Join Society
-    </button>
-  </div>
-
-  <!-- Confirmation of join society popup -->
-  <div
-    id="confirmJoinModal"
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
-  >
-    <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md text-center">
-      <h2 class="text-xl font-bold mb-4">Join Society</h2>
-      <p class="mb-6">
-        You will now be a member of this Society and it will be added into the
-        My Groups section of this website
-      </p>
-      <form
-        method="POST"
-        action="{{ url_for('join_group', group_id=group.society_id) }}"
-      >
-        <!-- Adds user to the society and updated db through app.py -->
-        <button
-          type="submit"
-          class="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700 mr-2"
-        >
-          Confirm Join
-        </button>
-        <button
-          type="button"
-          onclick="closeJoinModal()"
-          class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-        >
-          Cancel
-        </button>
-      </form>
-    </div>
-  </div>
-  {% endif %} {% endif %} {% endif %}
-
   <!-- Pinned messages go here -->
   <div
     class="bg-white p-8 rounded-xl shadow max-w-3xl w-full shadow-md ml-auto"
@@ -125,8 +29,134 @@
     >
       Create new announcement
     </button>
+    {% endif %}
 
-    <!-- Modal for entering announcement -->
+    <!-- If Non Admin nor are they a member... -->
+
+    {% if not is_member and not can_delete %}
+    <!-- If not already a member, they can join -->
+    <div class="py-4 flex justify-center space-x-4">
+      <button
+        onclick="openJoinModal()"
+        class="bg-amber-600 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-700"
+      >
+        Join Society
+      </button>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- If the user is logged in and they are either a member or an admin/group owner... -->
+  {% if user_id and (is_member or can_delete) %}
+  <!-- Calendar created here -->
+  <div class="max-w-3xl w-full bg-white shadow-md rounded-xl p-8 ml-auto">
+    <h1 class="text-3xl font-bold text-center text-cyan-700 mb-6">
+      Group Availability Calendar
+    </h1>
+    <p class="text-center">
+      Select the days you are available within the next month
+    </p>
+    <br />
+    <p class="text-center">Green means everyone is available on that day</p>
+    <p class="text-center">
+      Blue are the ones you have highlighted, with currently selected dates
+      outlined in blue.
+    </p>
+
+    <!-- Form -->
+    <div class="bg-white p-6 rounded-lg shadow max-w-2xl mx-auto">
+      <h2 class="text-xl font-semibold mb-4 text-center">
+        Select Your Availability
+      </h2>
+      <form method="POST">
+        <div class="grid grid-cols-7 gap-2 my-4">
+          {% for day in date_list %}
+          <!-- Going through all dates individually -->
+          {% set is_common = day in common_dates %}
+          <!-- is_common and is_selected is set -->
+          {% set is_selected = user_selected and (day in user_selected) %}
+          <!-- set is_common and is_selected. is_common shows all dates other users have also selected, and is_selected shows the dates the current user has selected -->
+
+          {% set bg_class = "bg-gray-300" %}
+          <!-- If nothing is selected the background colour is gray -->
+          {% if is_common %}
+          <!-- If is_common is true, the dates will be highlighted green -->
+          {% set bg_class = "bg-green-500 text-white" %}
+          <!-- elif -->
+          {% elif is_selected %}
+          <!-- If is_selected is true, the dates will be highlighted blue -->
+          {% set bg_class = "bg-blue-500 text-white" %}
+          <!-- endif -->
+          {% endif %}
+
+          <label class="cursor-pointer">
+            <input
+              type="checkbox"
+              name="available_dates"
+              value="{{ day }}"
+              class="hidden peer"
+              {%
+              if
+              is_selected
+              %}
+              checked
+              {%
+              endif
+              %}
+            />
+            <!-- If the date is alreadt selected change it to become checked -->
+            <div
+              class="{{ bg_class }} peer-checked:ring-2 ring-offset-1 ring-blue-300 p-2 rounded text-center"
+            >
+              {{ day | safe }}
+            </div>
+          </label>
+          {% endfor %}
+        </div>
+        <button
+          type="submit"
+          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Submit Availability
+        </button>
+      </form>
+    </div>
+    {% endif %}
+
+    <!-- Delete Society button if admin or group owner -->
+    {% if can_delete %}
+    <div class="py-4 flex justify-center space-x-4">
+      <button
+        onclick="openModal()"
+        class="bg-red-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-red-700"
+      >
+        Delete Society
+      </button>
+      <!-- Edit society button -->
+
+      <a href="{{ url_for('update_group', group_id=group.society_id) }}">
+        <button
+          class="bg-gray-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-gray-600"
+        >
+          Edit Society Details
+        </button>
+      </a>
+    </div>
+    {% else %} {% if is_member %}
+    <!-- If already a member, they can leave -->
+    <div class="py-4 flex justify-center space-x-4">
+      <button
+        onclick="openLeaveModal()"
+        class="bg-amber-600 text-white px-4 py-2 rounded-full text-sm hover:bg-amber-700"
+      >
+        Leave Society
+      </button>
+    </div>
+    {% endif %} {% endif %}
+
+    <!-- ALL MODALS LOCATED HERE -->
+
+    <!-- Announcement modal -->
     <div
       id="announcementModal"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden"
@@ -165,118 +195,109 @@
         </form>
       </div>
     </div>
-    {% endif %}
-  </div>
 
-  <!-- Calendar created here -->
-  <div class="max-w-3xl w-full bg-white shadow-md rounded-xl p-8 ml-auto">
-    <h1 class="text-3xl font-bold text-center text-cyan-700 mb-6">
-      Group Availability Calendar
-    </h1>
-    <p class="text-center">
-      Select the days you are available within the next month
-    </p>
-
-    <!-- Form -->
-    <div class="bg-white p-6 rounded-lg shadow max-w-2xl mx-auto">
-      <h2 class="text-xl font-semibold mb-4 text-center">
-        Select Your Availability
-      </h2>
-      <form method="POST">
-        <div class="grid grid-cols-7 gap-2 my-4">
-          {% for day in date_list %}
-          <label class="cursor-pointer">
-            <input
-              type="checkbox"
-              name="available_dates"
-              value="{{ day }}"
-              class="hidden peer"
-            />
-            <div
-              class="peer-checked:bg-green-500 bg-gray-300 p-2 rounded text-center"
-            >
-              {{ day | safe }}
-              <!-- the '| safe' removes the line break between the day and the date - this <br> can be seen in app.py -->
-            </div>
-          </label>
-          {% endfor %}
-        </div>
-        <button
-          type="submit"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+    <!-- Join society modal -->
+    <div
+      id="confirmJoinModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
+    >
+      <div
+        class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md text-center"
+      >
+        <h2 class="text-xl font-bold mb-4">Join Society</h2>
+        <p class="mb-6">
+          You will now be a member of this Society and it will be added into the
+          My Groups section of this website
+        </p>
+        <form
+          method="POST"
+          action="{{ url_for('join_group', group_id=group.society_id) }}"
         >
-          Submit Availability
-        </button>
-      </form>
+          <button
+            type="submit"
+            class="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700 mr-2"
+          >
+            Confirm Join
+          </button>
+          <button
+            type="button"
+            onclick="closeJoinModal()"
+            class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+        </form>
+      </div>
+    </div>
 
-      <!-- Display common dates -->
-      <div class="mt-4">
-        <h2 class="text-lg font-bold">Common Availability:</h2>
-        <ul>
-          {% for day in common_dates %}
-          <!-- This looks at all the dates users has in common and outputs all the dates that everyone is available for -->
-          <li class="text-green-700">{{ day | replace('<br />', ' ') }}</li>
-          <!-- The format needs to change for this output, as I required this format to be inline, therefore changing the line break into whitespace -->
-          {% else %}
-          <li class="text-red-600">No common dates yet.</li>
-          {% endfor %}
-        </ul>
+    <!-- Leave society modal -->
+    <div
+      id="confirmLeaveModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
+    >
+      <div
+        class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md text-center"
+      >
+        <h2 class="text-xl font-bold mb-4">Are you sure?</h2>
+        <p class="mb-6">
+          This will remove you from this society and will be removed from the My
+          Groups section of the website
+        </p>
+        <form
+          method="POST"
+          action="{{ url_for('leave_group', group_id=group.society_id) }}"
+        >
+          <button
+            type="submit"
+            class="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700 mr-2"
+          >
+            Confirm Deletion
+          </button>
+          <button
+            type="button"
+            onclick="closeLeaveModal()"
+            class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Deletion modal -->
+    <div
+      id="confirmModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
+    >
+      <div
+        class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md text-center"
+      >
+        <h2 class="text-xl font-bold mb-4">Are you sure?</h2>
+        <p class="mb-6">
+          This will permanently delete the society and automatically remove
+          other members.
+        </p>
+        <form
+          method="POST"
+          action="{{ url_for('delete_group', group_id=group.society_id) }}"
+        >
+          <button
+            type="submit"
+            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 mr-2"
+          >
+            Confirm Deletion
+          </button>
+          <button
+            type="button"
+            onclick="closeModal()"
+            class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+        </form>
       </div>
     </div>
   </div>
-
-  {% if can_delete %}
-  <!-- Delete Society button available for admins and group creators -->
-  <div class="fixed bottom-16 right-4">
-    <button
-      onclick="openModal()"
-      class="bg-red-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-red-700"
-    >
-      Delete Society
-    </button>
-
-    <a href="{{ url_for('update_group', group_id=group.society_id) }}">
-      <button
-        class="bg-gray-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-gray-600"
-      >
-        Edit Society Details
-      </button>
-    </a>
-  </div>
-
-  <!-- Confirmation of deletion pop up -->
-  <div
-    id="confirmModal"
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
-  >
-    <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md text-center">
-      <h2 class="text-xl font-bold mb-4">Are you sure?</h2>
-      <p class="mb-6">
-        This will permanently delete the society and automatically remove other
-        members.
-      </p>
-      <form
-        method="POST"
-        action="{{ url_for('delete_group', group_id=group.society_id) }}"
-      >
-        <!-- Deletes the society from the database and removes all users as members -->
-        <button
-          type="submit"
-          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 mr-2"
-        >
-          Confirm Deletion
-        </button>
-        <button
-          type="button"
-          onclick="closeModal()"
-          class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-        >
-          Cancel
-        </button>
-      </form>
-    </div>
-  </div>
-  {% endif %}
 
   <!-- Script for modal -->
   <!-- Modal was created using code from (W3Schools, 2025) -->

@@ -273,6 +273,11 @@ def submit_group():
     filename='default.png'
     # This is the default image - stored in 'static/group_images'
 
+    name_exists = Societies.query.filter_by(name=name).first()
+    # Checks if Society name already exists
+    if name_exists:
+            return render_template('create_group.html', error="This Society already exists, you are making a duplicate.")
+
     if image and image.filename != '':
         filename = secure_filename(image.filename)
         image.save(os.path.join(app.static_folder, 'group_images', filename))
@@ -321,19 +326,21 @@ def group_detail(group_id):
         is_member = Staff_Societies.query.filter_by(staff_id=user_id, society_id=group_id).first()
         # Checks if the user id is already a member
     
+    user_selected = set()
+
     if request.method == 'POST':
         if 'user_id' not in session:
             # If the user isn't logged in this error will be thrown
             error = "You must be logged in to submit availability."
         else:
-            selected_dates = set(request.form.getlist('available_dates'))
+            user_selected = set(request.form.getlist('available_dates'))
             # Show available dates
 
              # Clear old availability entries for this user ready for replacement
             Date_Availability.query.filter_by(staff_id=user_id, society_id=group_id).delete()
 
             # Add new entries
-            for date_str in selected_dates:
+            for date_str in user_selected:
                 new_entry = Date_Availability(
                     society_id=group_id,
                     staff_id=user_id,
@@ -370,6 +377,7 @@ def group_detail(group_id):
         can_delete=can_delete,
         date_list=date_list,
         common_dates=common_dates,
+        user_selected=user_selected,
         error=error,
     )
     # Everything that needs rendering for this page to work
