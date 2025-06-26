@@ -23,7 +23,7 @@ if __name__ == '__main__':
         if not admin:
             admin_user = Staff(
             staff_username='admin',
-            job_role='admin',
+            job_role='Admin',
             staff_email='admin@staff.uk',
             password='admin123'
         )

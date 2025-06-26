@@ -16,19 +16,29 @@
         <h1 class="text-3xl font-bold">Hello {{staff_username}}</h1>
       </div>
 
-      {% if staff_username == 'admin' %}
-      <div class="p-8">
-        <h1 class="text-3xl font-bold">Admins cannot delete their account</h1>
-      </div>
+      <div class="flex flex-col space-y-2">
+        <a href="{{ url_for('update_account') }}">
+          <button
+            class="bg-gray-500 text-white px-4 py-2 rounded-full text-sm hover:bg-gray-600"
+          >
+            Edit Account
+          </button>
+        </a>
 
-      {% else %}
-      <!-- Delete Account -->
-      <button
-        onclick="openDeleteModal()"
-        class="bg-red-600 text-white px-4 py-2 rounded-full text-sm hover:bg-red-700"
-      >
-        Delete Account
-      </button>
+        {% if job_role == 'Admin' %}
+        <div class="p-8">
+          <h1 class="text-3xl font-bold">Admins cannot delete their account</h1>
+        </div>
+
+        {% else %}
+        <!-- Delete Account -->
+        <button
+          onclick="openDeleteModal()"
+          class="bg-red-600 text-white px-4 py-2 rounded-full text-sm hover:bg-red-700"
+        >
+          Delete Account
+        </button>
+      </div>
 
       <!-- Confirmation deletion of account -->
       <div
@@ -79,3 +89,66 @@
     </script>
   </body>
 </html>
+
+<!-- Code to create success message popup -->
+{% if success %}
+<style>
+  @keyframes slideUp {
+    0% {
+      transform: translate(-50%, 100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+  }
+
+  #alert {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: green;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 300px;
+    animation: slideUp 0.5s ease-out;
+  }
+</style>
+
+<div id="alert">
+  <span>{{ success }}</span>
+  <button
+    onclick="closeAlert()"
+    style="
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      margin-left: 16px;
+      cursor: pointer;
+    "
+  >
+    &times;
+  </button>
+</div>
+
+<script>
+  function closeAlert() {
+    const alert = document.getElementById("alert");
+    if (alert) {
+      alert.style.display = "none";
+    }
+  }
+
+  // Auto-close after 5 seconds
+  setTimeout(closeAlert, 5000);
+</script>
+{% endif %}

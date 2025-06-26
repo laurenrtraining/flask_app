@@ -3,19 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registration Form</title>
+    <title>Update Account</title>
     <!--  Tailwind CSS utilised within the HTML using CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-cyan-600 flex items-center justify-center min-h-screen">
     <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
       <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">
-        Register
+        Update Account
       </h2>
-      <!-- Creates a box popup in the middle of the page - this is a new page that can only be accessed through the sign in page -->
+      <!-- Creates a box popup in the middle of the page - this is a new page that can only be accessed through the update account button -->
 
       <form
-        action="{{ url_for('registration') }}"
+        action="{{ url_for('update_account') }}"
         method="POST"
         class="space-y-4"
       >
@@ -23,46 +23,29 @@
           <label
             for="staff_username"
             class="block text-sm font-medium text-gray-700"
-            >Username</label
+            >Username:</label
           >
           <input
             type="text"
-            id="staff_username"
-            name="staff_username"
+            name="username"
+            id="username"
+            value="{{ current_username }}"
             required
             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-        </div>
-        <!-- Enter username - either real name or staff id -->
-
-        <div>
-          <label for="job_role" class="block text-sm font-medium text-gray-700"
-            >Job Role</label
-          >
-          <!-- What job role does the user have in the office - can possible be used for statistics of webpage use later -->
-          <select
-            id="job_role"
-            name="job_role"
-            required
-            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="" disabled selected>-- Select Role --</option>
-            <option value="Admin">Admin</option>
-            <option value="Non-admin">Non Admin</option>
-          </select>
         </div>
 
         <div>
           <label
             for="staff_email"
             class="block text-sm font-medium text-gray-700"
-            >Email</label
+            >Email:</label
           >
-          <!-- Email is needed incase users need to be contacted at some point -->
           <input
             type="email"
-            id="staff_email"
-            name="staff_email"
+            name="email"
+            id="email"
+            value="{{ current_email }}"
             required
             pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -71,31 +54,48 @@
 
         <div class="mb-4 relative">
           <label for="password" class="block text-sm font-medium text-gray-700"
-            >Password</label
+            >New Password (leave blank if no change):</label
           >
-          <!-- Choose password -->
           <input
             type="password"
-            id="password"
             name="password"
-            required
+            id="password"
+            placeholder="New password"
             minlength="8"
             pattern="(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d_@]{8,}"
             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
           />
-
           <!-- Show password button -->
           <div class="flex items-center space-x-2">
-            <input type="checkbox" onclick="togglePassword()" />
+            <input type="checkbox" onclick="togglePassword1()" />
             <label for="show-password" class="text-sm text-gray-700"
               >Show Password</label
             >
           </div>
+        </div>
 
-          <p class="text-sm text-gray-500 mt-1">
-            Password must be at least 8 characters long and include at least one
-            number.
-          </p>
+        <div class="mb-4 relative">
+          <label
+            for="confirm_password"
+            class="block text-sm font-medium text-gray-700"
+            >Confirm New Password:</label
+          >
+          <input
+            type="password"
+            name="confirm_password"
+            id="confirm_password"
+            placeholder="Confirm new password"
+            minlength="8"
+            pattern="(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d_@!]{8,}"
+            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+          />
+          <!-- Show password button -->
+          <div class="flex items-center space-x-2">
+            <input type="checkbox" onclick="togglePassword2()" />
+            <label for="show-password" class="text-sm text-gray-700"
+              >Show Password</label
+            >
+          </div>
         </div>
 
         <div>
@@ -103,25 +103,23 @@
             type="submit"
             class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200"
           >
-            Sign Up
+            Update Account
           </button>
         </div>
       </form>
-
-      <p class="text-sm text-center text-gray-600 mt-4">
-        Already have an account?
-        <a href="\sign_in.html" class="text-blue-600 hover:underline"
-          >Sign in</a
-        >
-        <!-- Links back to sign in page -->
-      </p>
     </div>
   </body>
 
   <!-- Show password function -->
   <script>
-    function togglePassword() {
+    function togglePassword1() {
       const pwd = document.getElementById("password");
+      pwd.type = pwd.type === "password" ? "text" : "password";
+    }
+  </script>
+  <script>
+    function togglePassword2() {
+      const pwd = document.getElementById("confirm_password");
       pwd.type = pwd.type === "password" ? "text" : "password";
     }
   </script>
