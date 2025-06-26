@@ -192,7 +192,7 @@ if __name__ == "__main__":
         societies = [
             {
                 "society_id": 1,
-                "name": "Bouldering",
+                "name": "Climbing",
                 "description": "V0s to V17s welcome for both top rope and bouldering!",
                 "created_by": 3,
                 "image_filename": "climbing.jpg",
@@ -201,9 +201,9 @@ if __name__ == "__main__":
             {
                 "society_id": 2,
                 "name": "Football",
-                "description": "Join us to play friendly and competitive soccer matches.",
+                "description": "Join us to play friendly and competitive football matches.",
                 "created_by": 5,
-                "image_filename": "soccer.jpg",
+                "image_filename": "football.jpg",
                 "announcement": None,
             },
             {
@@ -255,11 +255,11 @@ if __name__ == "__main__":
                 "announcement": "Next competition is scheduled for July 15th.",
             },
             {
-                "society_id": 9,
-                "name": "Rock Climbing",
-                "description": "Top rope and lead climbing for all skill levels.",
-                "created_by": 10,
-                "image_filename": "rock_climbing.jpg",
+                "society_id": 10,
+                "name": "Kayaking",
+                "description": "Explore rivers and lakes with guided kayaking trips for beginners and experts alike.",
+                "created_by": 7,
+                "image_filename": "kayaking.jpg",
                 "announcement": None,
             },
             {
