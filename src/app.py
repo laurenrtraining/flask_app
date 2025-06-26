@@ -116,8 +116,10 @@ def my_account():
     staff = Staff.query.get(user_id)
     staff_username = session.get('staff_username')
     job_role = session.get('job_role')
+    message = request.args.get('message') 
+    # Gets any success messages from other functions
 
-    return render_template('my_account.html', staff=staff, staff_username=staff_username, job_role=job_role)
+    return render_template('my_account.html', staff=staff, staff_username=staff_username, job_role=job_role, message=message)
     # Account page is rendered
 
 ### EDITING ACCOUNTS IN THE DATABASE ###
@@ -149,7 +151,7 @@ def update_account():
         # Commit changes to DB
         db.session.commit()
 
-        return render_template('my_account.html', staff=user, staff_username=user.staff_username, staff_email=user.staff_email, job_role=job_role, message="Account updated successfully.")
+        return redirect(url_for('my_account', message="Account updated successfully."))
 
 
     # GET request: prefill form with current info
