@@ -25,7 +25,7 @@ def client():
         db.create_all()
 
         with app.test_client() as client:
-            yield app.test_client()
+            yield client
 
         db.session.remove()
         db.drop_all()
@@ -493,3 +493,8 @@ def test_announcement(client):
     # Check the DB to verifythe announcement was added to the db
     updated_society = db.session.get(Societies, society.society_id)
     assert updated_society.announcement == 'This is an announcement'
+
+# # Just do a couple of tests
+# # Pics of the tests
+# # testing approach
+# # # Example screenshot
