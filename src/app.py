@@ -35,7 +35,8 @@ app.secret_key = os.urandom(24)
 def index():
     groups = Societies.query.all()
     staff_username = session.get('staff_username')
-    return render_template('index.html', groups=groups, staff_username=staff_username)
+    job_role = session.get('job_role')
+    return render_template('index.html', groups=groups, staff_username=staff_username, job_role=job_role)
 
 # Render sign in page
 @app.route('/sign_in.html', methods=['GET','POST'])
@@ -96,14 +97,49 @@ def logout():
 
 ### RENDERING ACCOUNT PAGE AND SETTINGS ###
 
-
 @app.route('/my_account')
 def my_account():
     user_id = session.get('user_id')
-    staff_username = session.get('staff_username')
     staff = Staff.query.get(user_id)
+    staff_username = session.get('staff_username')
+    job_role = session.get('job_role')
 
-    return render_template('my_account.html', staff=staff, staff_username=staff_username)
+    return render_template('my_account.html', staff=staff, staff_username=staff_username, job_role=job_role)
+    # Account page is rendered
+
+### EDITING GROUPS IN THE DATABASE ###
+
+@app.route('/update_account', methods=['GET','POST'])
+def update_account():
+    job_role = session.get('job_role')
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('sign_in'))
+
+    user = Staff.query.get(user_id)
+    if request.method == 'POST':
+        staff_username = request.form.get('username').strip()
+        staff_email = request.form.get('email').strip()
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        # Validate inputs
+        if password:
+            if password != confirm_password:
+                return render_template('update_account.html', staff_username=user.staff_username, staff_email=user.staff_email, error="Passwords do not match.")
+        
+        # Update username and email
+        user.staff_username = staff_username
+        user.staff_email = staff_email
+        user.password = password
+
+        # Commit changes to DB
+        db.session.commit()
+
+        return render_template('my_account.html', staff=user, staff_username=user.staff_username, staff_email=user.staff_email, job_role=job_role, message="Account updated successfully.")
+
+    # GET request: prefill form with current info
+    return render_template('update_account.html', current_username=user.staff_username, current_email=user.staff_email)
 
 @app.route('/staff/<int:staff_id>/delete', methods=['POST'])
 def delete_account(staff_id):
