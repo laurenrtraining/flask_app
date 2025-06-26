@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, a
 import os
 from database.database import db, Staff, Societies, Staff_Societies, Date_Availability
 from werkzeug.utils import secure_filename
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from collections import defaultdict
 
 instance_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'instance')) 
@@ -136,10 +136,10 @@ def update_account():
     if not user_id:
         return redirect(url_for('sign_in'))
 
-    user = Staff.query.get(user_id)
+    user = db.session.get(Staff, user_id)
     if request.method == 'POST':
-        staff_username = request.form.get('username').strip()
-        staff_email = request.form.get('email').strip()
+        staff_username = request.form.get('staff_username').strip()
+        staff_email = request.form.get('staff_email').strip()
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
 
@@ -307,6 +307,10 @@ def submit_group():
 ### CODE BASE FOR ALL NEW SOCIETIES THAT ARE MADE - MADE GENERIC FOR ALL SOCIETIES ###
 
 @app.route('/group/<int:group_id>', methods=['GET', 'POST'])
+# def change_display_date(display_str):
+#     database_appropriate = display_str.replace('<br />','')[-5:]
+#     passed_in = datetime.strptime(database_appropriate, '%d-%m').date()
+#     return passed_in.replace(year=date.today().year)
 def group_detail(group_id):
     group = db.session.get(Societies, group_id)
     user_id = session.get('user_id')
@@ -319,6 +323,7 @@ def group_detail(group_id):
     # checks if the society was created by the user currently logged in
 
     today = date.today() 
+    print(today)
     # From today, the calendar will show a consecutive month
     date_list = [(today + timedelta(days=i)).strftime('%a<br />%d-%m')for i in range(31)] 
     # In the form (abbreviated day, date, month) and spans 31 days (1 month)
@@ -348,12 +353,22 @@ def group_detail(group_id):
              # Clear old availability entries for this user ready for replacement
             Date_Availability.query.filter_by(staff_id=user_id, society_id=group_id).delete()
 
+            # A nested function is needed to convert the date that I currently have - it currently stored date as a string, but its needed as a date
+            def convert_date(display_str):
+                try:
+                    cleaned = display_str.replace('<br />', '')[-5:]  #The date is currently stored in ('%a<br />%d-%m') form (Mon<br />15-07) in which we only need the last 5 characters hence the [-5:] (StackOverflow, n.d.)
+                    parsed = datetime.strptime(cleaned, '%d-%m').date()
+                    return parsed.replace(year=date.today().year) # Adds the year to the date and returns it
+                except ValueError:
+                    return None  # handle bad input gracefully
+    
             # Add new entries
             for date_str in user_selected:
+                date_to_store = convert_date(date_str)
                 new_entry = Date_Availability(
                     society_id=group_id,
                     staff_id=user_id,
-                    available_dates=date_str  # assuming it's stored as a string in your model
+                    available_dates=date_to_store  # assuming it's stored as a string in your model
                 )
                 db.session.add(new_entry)
                 # Add date availabilities to database
@@ -374,6 +389,8 @@ def group_detail(group_id):
         # Searches for the dates that every user has in common
     else:
         common_dates = set()
+
+    common_dates = {d.strftime('%a<br />%d-%m') for d in common_dates} # Needed to help convery to the same format so the previously selevted dates can render
 
     return render_template(
         'society_template/group_detail.html',
@@ -435,7 +452,7 @@ def announcement(group_id):
 
     if group is None:
         abort(404)
-        
+
     if not can_delete:
         abort(403)  # Forbidden
 

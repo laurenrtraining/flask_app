@@ -48,6 +48,6 @@ class Date_Availability(db.Model):
     calendar_id = db.Column(db.Integer, primary_key=True)
     staff_id = db.Column(db.Integer, db.ForeignKey('staff.staff_id'), nullable=False)
     society_id = db.Column(db.Integer, db.ForeignKey('societies.society_id'), nullable=False)
-    available_dates = db.Column(db.PickleType, nullable=False)  # Stores list of dates
+    available_dates = db.Column(db.Date, nullable=False)  # Stores list of dates
 
     # Lists all the dates users are available and which user submitted the change
