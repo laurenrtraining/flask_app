@@ -3,99 +3,64 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Update Account</title>
+    <title>Update Society Details</title>
     <!--  Tailwind CSS utilised within the HTML using CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-cyan-600 flex items-center justify-center min-h-screen">
     <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
       <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">
-        Update Account
+        Update Society Details
       </h2>
       <!-- Creates a box popup in the middle of the page - this is a new page that can only be accessed through the update account button -->
 
       <form
-        action="{{ url_for('update_account') }}"
+        action="{{ url_for('update_group', group_id=group.society_id) }}"
         method="POST"
+        enctype="multipart/form-data"
         class="space-y-4"
       >
         <div>
-          <label
-            for="staff_username"
-            class="block text-sm font-medium text-gray-700"
-            >Username:</label
+          <label for="name" class="block text-sm font-medium text-gray-700"
+            >Group Name</label
           >
           <input
             type="text"
-            name="username"
-            id="username"
-            value="{{ current_username }}"
+            id="name"
+            name="name"
+            value="{{ current_name }}"
+            placeholder="Group Name"
             required
             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         <div>
-          <label
-            for="staff_email"
-            class="block text-sm font-medium text-gray-700"
-            >Email:</label
+          <label for="name" class="block text-sm font-medium text-gray-700"
+            >Description</label
           >
-          <input
-            type="email"
-            name="email"
-            id="email"
-            value="{{ current_email }}"
-            required
-            pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
+          <textarea
+            type="text"
+            id="description"
+            name="description"
+            placeholder="Description"
             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          >
+{{ group.description }}</textarea
+          >
+          <!-- Shows the current description before update -->
         </div>
 
-        <div class="mb-4 relative">
-          <label for="password" class="block text-sm font-medium text-gray-700"
-            >New Password (leave blank if no change):</label
-          >
-          <input
-            type="password"
-            name="password"
-            id="password"
-            placeholder="New password"
-            minlength="8"
-            pattern="(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d_@]{8,}"
-            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
-          />
-          <!-- Show password button -->
-          <div class="flex items-center space-x-2">
-            <input type="checkbox" onclick="togglePassword1()" />
-            <label for="show-password" class="text-sm text-gray-700"
-              >Show Password</label
-            >
-          </div>
-        </div>
+        <div class="mt-4">
+          {% if group.image_filename %}
+          <p class="text-sm text-gray-600 mb-2">
+            Current image:
+            <span class="font-medium">{{ group.image_filename }}</span>
+          </p>
+          {% endif %}
+          <!-- If there is an image in existence this will display it before update -->
 
-        <div class="mb-4 relative">
-          <label
-            for="confirm_password"
-            class="block text-sm font-medium text-gray-700"
-            >Confirm New Password:</label
-          >
-          <input
-            type="password"
-            name="confirm_password"
-            id="confirm_password"
-            placeholder="Confirm new password"
-            minlength="8"
-            pattern="(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d_@!]{8,}"
-            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
-          />
-          <!-- Show password button -->
-          <div class="flex items-center space-x-2">
-            <input type="checkbox" onclick="togglePassword2()" />
-            <label for="show-password" class="text-sm text-gray-700"
-              >Show Password</label
-            >
-          </div>
+          <input type="file" name="image_filename" />
         </div>
 
         <div>
@@ -103,7 +68,7 @@
             type="submit"
             class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200"
           >
-            Update Account
+            Update Group
           </button>
         </div>
       </form>
