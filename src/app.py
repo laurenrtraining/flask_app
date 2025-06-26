@@ -38,7 +38,9 @@ app.secret_key = os.urandom(24)
 def index():
     groups = Societies.query.all()
     job_role = session.get('job_role')
-    return render_template('index.html', groups=groups, job_role=job_role)
+    success = request.args.get('success') 
+    # Gets any success messages from other functions
+    return render_template('index.html', groups=groups, job_role=job_role, success=success)
 # Shows 'create group' if users are signed in and displays all groups in existence
 
 # Render sign in page
@@ -113,12 +115,93 @@ def logout():
 @app.route('/my_account')
 def my_account():
     user_id = session.get('user_id')
+    staff = Staff.query.get(user_id)
     staff_username = session.get('staff_username')
     job_role = session.get('job_role')
-    staff = Staff.query.get(user_id)
+    success = request.args.get('success') 
+    # Gets any success messages from other functions
 
-    return render_template('my_account.html', staff=staff, staff_username=staff_username, job_role=job_role)
+    return render_template('my_account.html', staff=staff, staff_username=staff_username, job_role=job_role, success=success)
     # Account page is rendered
+
+
+### EDITING ACCOUNTS IN THE DATABASE ###
+
+@app.route('/update_account', methods=['GET','POST'])
+def update_account():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('sign_in'))
+
+    user = Staff.query.get(user_id)
+    if request.method == 'POST':
+        staff_username = request.form.get('username').strip()
+        staff_email = request.form.get('email').strip()
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        # Validate inputs
+        if password:
+            if password != confirm_password:
+                return render_template('update_account.html', staff_username=user.staff_username, staff_email=user.staff_email, error="Passwords do not match.")
+        
+        # Update username and email
+        user.staff_username = staff_username
+        user.staff_email = staff_email
+        user.password = password
+
+        # Commit changes to DB
+        db.session.commit()
+
+        return redirect(url_for('my_account', success="Account updated successfully."))
+
+
+    # GET request: prefill form with current info
+    return render_template('update_account.html', current_username=user.staff_username, current_email=user.staff_email)
+
+
+### EDITING GROUPS IN THE DATABASE ###
+
+@app.route('/update_group/<int:group_id>', methods=['GET','POST'])
+def update_group(group_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('sign_in'))
+
+    group = Societies.query.get_or_404(group_id)
+
+    if request.method == 'POST':
+        name = request.form.get('name').strip()
+        description = request.form.get('description').strip()
+        image = request.files.get('image_filename')
+
+        if image and image.filename != '':
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(app.static_folder, 'group_images', filename))
+            group.image_filename = filename
+            # Saves to database regardless of if there is an image found or not
+        
+        # Update username and email
+        group.name = name
+        group.description = description
+        
+
+        # Commit changes to DB
+        db.session.commit()
+        return redirect(url_for('index', success="Group updated successfully."))
+
+
+    # GET request: prefill form with current info
+    return render_template(
+    'update_group.html',
+    group=group,
+    current_name=group.name,
+    current_description=group.description,
+    current_image=group.image_filename
+)
+
+
+### DELETE USER ACCOUNT ###
 
 @app.route('/staff/<int:staff_id>/delete', methods=['POST'])
 def delete_account(staff_id):

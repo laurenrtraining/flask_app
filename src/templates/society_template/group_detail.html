@@ -234,6 +234,14 @@
     >
       Delete Society
     </button>
+
+    <a href="{{ url_for('update_group', group_id=group.society_id) }}">
+      <button
+        class="bg-gray-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-gray-600"
+      >
+        Edit Society Details
+      </button>
+    </a>
   </div>
 
   <!-- Confirmation of deletion pop up -->
