@@ -65,8 +65,8 @@
   </body>
 </html>
 
-<!-- Code to create error popup -->
-{% if error %}
+<!-- Code to create success message popup -->
+{% if success %}
 <style>
   @keyframes slideUp {
     0% {
@@ -84,7 +84,7 @@
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #f44336;
+    background-color: green;
     color: white;
     padding: 16px 24px;
     border-radius: 8px;
@@ -99,7 +99,7 @@
 </style>
 
 <div id="alert">
-  <span>{{ error }}</span>
+  <span>{{ success }}</span>
   <button
     onclick="closeAlert()"
     style="
