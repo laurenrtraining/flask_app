@@ -4,16 +4,14 @@ import pytest
 from datetime import date, timedelta
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-# Similar to what I needed to do in app.py, this line ensures the test file looks in the correct place for app
+# Ensures the test file looks in the correct place for app (Pytest, 2025).
 
 from app import app
 from database.database import db, Staff, Societies, Staff_Societies, Date_Availability
 
-# (Pytest, 2025).
-
 
 @pytest.fixture
-# This client function simulates the database and prevents tests against real data
+# Client function simulates the database and prevents tests against real data
 def client():
     app.config["TESTING"] = True
     app.config["WTF_CSRF_ENABLED"] = False
@@ -29,7 +27,6 @@ def client():
         db.session.remove()
         db.drop_all()
         # After running the tests, they are deleted from the database
-        # This way they don't pollute the main db
 
 
 ### MAIN TESTS ###
@@ -37,9 +34,7 @@ def client():
 
 # RENDER INDEX PAGE ON STARTUP
 def test_render_index_when_logged_out(client):
-    # GIVEN a logged-in staff user in the session
-    # WHEN the index page is requested
-    # THEN the response should be successful and contain the staff_username (Kennedy, 2023)
+    # If no one is logged in and the app is initialised this is what they will see
     response = client.get("/", follow_redirects=True)
     assert response.status_code == 200
     assert b"Guest" in response.data
@@ -162,6 +157,7 @@ def test_user_registration_if_existing(client):
 
     assert response.status_code == 200
     assert b"Email already registered. Please sign in." in response.data
+    # Registration success
 
 
 # TESTS THAT USER REGISTRATION SUCCESSFULLY ADDS TO DB

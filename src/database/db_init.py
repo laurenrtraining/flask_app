@@ -26,8 +26,6 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
 
-        # INSERT A SHIT TON OF TEST DATA
-
         staff_societies = [
             {
                 "staff_societies_id": 1,
@@ -110,7 +108,7 @@ if __name__ == "__main__":
                 "job_role": "Admin",
                 "staff_email": "bluefalcon@gmail.com",
                 "password": "Qf2_Ts3@gS!",
-            },  # original already valid
+            }, 
             {
                 "staff_id": 2,
                 "staff_username": "starry_night",
@@ -368,6 +366,8 @@ if __name__ == "__main__":
         )
         db.session.execute(upsert_date_availability)
         db.session.commit()
-
+        
+# All data is successfully added to database
 
 # Only run once to initialise database
+

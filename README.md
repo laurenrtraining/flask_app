@@ -1,5 +1,7 @@
 # flask_app
 
+GitHub Repository: https://github.com/laurenrtraining/flask_app
+
 # Step 1: Create virtual envrionment
 
 # Run the following commands:

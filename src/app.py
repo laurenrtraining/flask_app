@@ -9,7 +9,7 @@ from collections import defaultdict
 instance_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "instance")
 )
-# I needed to specify the route so the database isn't made in the wrong file
+# Route needed specifying so the database isn't made in the wrong file
 
 app = Flask(
     __name__,
@@ -41,8 +41,8 @@ app.secret_key = os.urandom(24)
 
 ### App.routes for rendering all pages ###
 
-### REGISTRSTION AND SIGN IN ###
 
+### REGISTRSTION AND SIGN IN ###
 
 # Render homepage
 @app.route("/")
@@ -54,7 +54,6 @@ def index():
     return render_template(
         "index.html", groups=groups, job_role=job_role, success=success
     )
-
 
 # Shows 'create group' if users are signed in and displays all groups in existence
 
@@ -353,10 +352,6 @@ def submit_group():
 
 
 @app.route("/group/<int:group_id>", methods=["GET", "POST"])
-# def change_display_date(display_str):
-#     database_appropriate = display_str.replace('<br />','')[-5:]
-#     passed_in = datetime.strptime(database_appropriate, '%d-%m').date()
-#     return passed_in.replace(year=date.today().year)
 def group_detail(group_id):
     group = db.session.get(Societies, group_id)
     user_id = session.get("user_id")
@@ -405,12 +400,12 @@ def group_detail(group_id):
                 staff_id=user_id, society_id=group_id
             ).delete()
 
-            # A nested function is needed to convert the date that I currently have - it currently stored date as a string, but its needed as a date
+            # A nested function is needed to convert the current date from string to date
             def convert_date(display_str):
                 try:
                     cleaned = display_str.replace("<br />", "")[
                         -5:
-                    ]  # The date is currently stored in ('%a<br />%d-%m') form (Mon<br />15-07) in which we only need the last 5 characters hence the [-5:] (StackOverflow, n.d.)
+                    ]  # The -5: only looks for the last 5 characters (StackOverflow, n.d.)
                     parsed = datetime.strptime(cleaned, "%d-%m").date()
                     return parsed.replace(
                         year=date.today().year
@@ -424,7 +419,7 @@ def group_detail(group_id):
                 new_entry = Date_Availability(
                     society_id=group_id,
                     staff_id=user_id,
-                    calendar_dates=date_to_store,  # assuming it's stored as a string in your model
+                    calendar_dates=date_to_store,
                 )
                 db.session.add(new_entry)
                 # Add date availabilities to database
@@ -448,7 +443,7 @@ def group_detail(group_id):
 
     common_dates = {
         d.strftime("%a<br />%d-%m") for d in common_dates
-    }  # Needed to help convery to the same format so the previously selevted dates can render
+    }  # Needed to help convert to the same format so the previously selevted dates can render
 
     return render_template(
         "society_template/group_detail.html",
@@ -490,8 +485,6 @@ def delete_group(group_id):
         db.session.delete(membership)
         db.session.commit()
     # Deletes the members from this society before the actual society is deleted
-    # This prevents issues like the users being members of a group that doesn't exist
-    # A previous error found that without this fix, users were automatically added to the next group to be made as it adopted the old groups ID
 
     db.session.delete(group)
     db.session.commit()
@@ -514,11 +507,10 @@ def announcement(group_id):
         abort(404)
 
     if not can_delete:
-        abort(403)  # Forbidden
+        abort(403) 
 
-    # Save to database
     new_announcement = request.form.get("announcement", "").strip()
-    # checks the database and overwrites what is there
+    # Sets new announcement
 
     if new_announcement:
         group.announcement = new_announcement
@@ -561,7 +553,6 @@ def join_group(group_id):
         staff_id=user_id, society_id=group_id, date_joined=date.today()
     )
     db.session.add(member)
-    # Add member to
     db.session.commit()
     return redirect(url_for("group_detail", group_id=group_id))
 
