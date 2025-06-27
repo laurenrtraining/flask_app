@@ -1,6 +1,7 @@
 # Imports
 from flask import Flask, render_template, request, redirect, url_for, session, abort
 import os
+from database.db_init import app, create_and_initialise_db
 from database.database import db, Staff, Societies, Staff_Societies, Date_Availability
 from werkzeug.utils import secure_filename
 from datetime import date, timedelta, datetime
@@ -585,5 +586,6 @@ def leave_group(group_id):
 if __name__ == "__main__":
     os.makedirs(app.instance_path, exist_ok=True)
     with app.app_context():
+        create_and_initialise_db()
         db.create_all()
     app.run(debug=True)
