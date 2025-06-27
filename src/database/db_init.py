@@ -9,9 +9,8 @@ from database.database import db, Staff, Societies, Staff_Societies, Date_Availa
 
 app = Flask(__name__, instance_relative_config=True)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
-    app.instance_path, "FLASK_DATABASE.db"
-)
+db_path = "/tmp/FLASK_DATABASE.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
 # Specified file location outside of src
 # Ensures database instance is created in the correct location
