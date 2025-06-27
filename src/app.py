@@ -179,11 +179,12 @@ def update_account():
                     staff_email=user.staff_email,
                     error="Passwords do not match.",
                 )
+            
+            user.password = password
 
         # Update username and email
         user.staff_username = staff_username
         user.staff_email = staff_email
-        user.password = password
 
         # Commit changes to DB
         db.session.commit()
